@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'UY QUE HEAVY',
     short_name: 'UYQH',
-    description: 'Ronda secreta conversacional tipo impostor para jugar desde el celular.',
+    description: 'Rondas conversacionales privadas para abrir conversaciones profundas desde el celular.',
     start_url: '/',
     display: 'standalone',
     orientation: 'portrait',

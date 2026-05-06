@@ -5,10 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { editionMap, type EditionKey } from '@/data/cards'
 import Card from './Card'
 import CategorySelector from './CategorySelector'
-import ModeSelector from './ModeSelector'
 import ProgressBar from './ProgressBar'
-
-const modes = ['Pareja', 'Amigos', 'Familia', 'Individual']
 
 interface ExperienceFlowProps {
   editionKey: string
@@ -16,7 +13,6 @@ interface ExperienceFlowProps {
 
 export default function ExperienceFlow({ editionKey }: ExperienceFlowProps) {
   const edition = editionMap[editionKey as EditionKey]
-  const [selectedMode, setSelectedMode] = useState(modes.includes(edition.title) ? edition.title : 'Pareja')
   const [selectedCategory, setSelectedCategory] = useState(edition.categories[0]?.key ?? '')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [finished, setFinished] = useState(false)
@@ -31,7 +27,6 @@ export default function ExperienceFlow({ editionKey }: ExperienceFlowProps) {
   const currentCard = filteredCards[currentIndex]
 
   useEffect(() => {
-    setSelectedMode('Pareja')
     setSelectedCategory(edition.categories[0]?.key ?? '')
     setCurrentIndex(0)
     setFinished(false)
@@ -112,18 +107,25 @@ export default function ExperienceFlow({ editionKey }: ExperienceFlowProps) {
       <div className="space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.32em] text-brand-violet">Modo {edition.title}</p>
-            <h2 className="mt-3 text-3xl font-semibold text-brand-soft">Elige una categoría para empezar.</h2>
+            <p className="text-sm uppercase tracking-[0.32em] text-brand-violet">{edition.title}</p>
+            <h2 className="mt-3 text-3xl font-semibold text-brand-soft">Elige una categoría dentro de esta edición.</h2>
           </div>
           <div className="rounded-3xl bg-brand-cream/90 px-4 py-3 text-sm text-[#574f49] shadow-sm">
             <span className="font-semibold">{totalCards}</span> cartas disponibles en esta categoría
           </div>
         </div>
-        <div className="space-y-4">
-          <p className="text-sm uppercase tracking-[0.32em] text-brand-violet">Modo de lectura</p>
-          <ModeSelector modes={modes} selected={selectedMode} onSelect={(mode) => setSelectedMode(mode)} />
-        </div>
-        <CategorySelector categories={edition.categories} selected={selectedCategory} onSelect={(key) => { setSelectedCategory(key); setCurrentIndex(0); setShareStatus('') }} />
+        <p className="text-base leading-7 text-[#564d47]">
+          Cada edición tiene sus propias categorías para acompañar un tipo de relación distinto. Aquí no hay modos extra: la edición define el tono y la categoría abre la conversación.
+        </p>
+        <CategorySelector
+          categories={edition.categories}
+          selected={selectedCategory}
+          onSelect={(key) => {
+            setSelectedCategory(key)
+            setCurrentIndex(0)
+            setShareStatus('')
+          }}
+        />
       </div>
 
       <div className="space-y-6">

@@ -2,8 +2,8 @@ import './globals.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'UY QUE HEAVY — Ronda secreta',
-  description: 'MVP conversacional tipo impostor para jugar desde el celular con cartas privadas, votacion y cierre emocional.',
+  title: 'UY QUE HEAVY — Conversaciones guiadas',
+  description: 'App conversacional mobile-first para abrir conversaciones profundas entre pareja, amigos y familia con cartas privadas y cierre emocional.',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
