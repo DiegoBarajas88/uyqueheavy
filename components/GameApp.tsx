@@ -52,6 +52,7 @@ export default function GameApp() {
   const sessionCategory = session ? getCategory(session.editionKey, session.categoryKey) : currentCategory
   const sessionMode = session ? gameModeMap[session.modeKey] : currentMode
   const activeVisual = editionVisuals[session?.editionKey ?? setup.editionKey]
+  const sessionHasVoting = session?.hasImpostor ?? false
   const currentRevealPlayer = session?.players[revealIndex] ?? null
   const currentConversationPlayer = session?.players[conversationIndex] ?? null
   const currentVotingPlayer = session?.players[votingIndex] ?? null
@@ -67,14 +68,14 @@ export default function GameApp() {
     const hasDuplicates = normalized.some((name, index) => normalized.indexOf(name) !== index)
 
     if (hasDuplicates) {
-      return 'Cada persona necesita un nombre distinto para que la votacion funcione bien.'
+      return 'Cada persona necesita un nombre distinto para que la ronda fluya bien.'
     }
 
     return ''
   }, [setup.playerNames])
 
   const voteSummary = useMemo(() => {
-    if (!session || stage !== 'results') {
+    if (!session || stage !== 'results' || !session.hasImpostor) {
       return null
     }
 
@@ -144,7 +145,7 @@ export default function GameApp() {
           variant: 'ghost'
         },
         {
-          label: conversationIndex === (session?.players.length ?? 1) - 1 ? 'Ir a votacion' : 'Siguiente jugador',
+          label: conversationIndex === (session?.players.length ?? 1) - 1 ? (sessionHasVoting ? 'Ir a votacion' : 'Ver cierre') : 'Siguiente jugador',
           onClick: handleAdvanceConversation,
           variant: 'primary'
         }
@@ -206,7 +207,7 @@ export default function GameApp() {
                 <div>
                   <p className="text-xs uppercase tracking-[0.32em] text-brand-violet">UY QUE HEAVY</p>
                   <h1 className="mt-2 text-2xl font-semibold leading-tight text-brand-soft">
-                    {stage === 'home' && 'Ronda secreta'}
+                    {stage === 'home' && 'Ronda guiada'}
                     {stage === 'setup' && 'Configura tu partida'}
                     {stage === 'reveal-cards' && 'Cartas privadas'}
                     {stage === 'conversation-round' && 'Empieza la ronda'}
@@ -295,7 +296,7 @@ export default function GameApp() {
                 />
               ) : null}
 
-              {stage === 'results' && session && voteSummary ? (
+              {stage === 'results' && session ? (
                 <ResultScreen
                   session={session}
                   summary={voteSummary}
@@ -361,10 +362,14 @@ export default function GameApp() {
     }
 
     if (conversationIndex === session.players.length - 1) {
-      setStage('voting')
-      setVotingIndex(0)
-      setVotingState('handoff')
-      setPendingVote(null)
+      if (session.hasImpostor) {
+        setStage('voting')
+        setVotingIndex(0)
+        setVotingState('handoff')
+        setPendingVote(null)
+      } else {
+        setStage('results')
+      }
       return
     }
 
@@ -439,16 +444,16 @@ function HomeScreen({ visualKey }: { visualKey: keyof typeof editionVisuals }) {
       <article className="overflow-hidden rounded-[1.8rem] border border-brand-wine/10 bg-gradient-to-br from-[#fcfaf8] via-[#f6eee8] to-[#efe0d4] p-5">
         <p className="text-xs uppercase tracking-[0.34em] text-brand-violet">Base jugable</p>
         <h2 className="mt-3 text-[2rem] font-semibold leading-[0.98] text-brand-soft">
-          Una ronda emocional con un impostor escondido.
+          Una ronda emocional por turnos, pensada para jugar desde el celular.
         </h2>
         <p className="mt-4 text-base leading-7 text-[#5b5049]">
-          Crea la partida, reparte cartas secretas en el celular y deja que la mesa descubra quien improvisa.
+          Crea la partida, reparte cartas privadas y deja que la mesa converse con una estructura clara. Si quieres, el modo impostor queda como una capa opcional.
         </p>
       </article>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <QuickFact label="Estados" value="5 pantallas" />
-        <QuickFact label="Juego" value="Sin backend" />
+        <QuickFact label="Minimo" value="2 personas" />
+        <QuickFact label="Juego" value="Turnos privados" />
         <QuickFact label="Visual" value={editionVisuals[visualKey].mood} />
       </div>
 
@@ -464,7 +469,7 @@ function HomeScreen({ visualKey }: { visualKey: keyof typeof editionVisuals }) {
         </div>
         <div className="mt-4 space-y-3 text-sm leading-6 text-[#5f534b]">
           <p>Selecciona edicion, modo, categoria, jugadores y nombres desde el mismo flujo.</p>
-          <p>La ronda secreta se reparte una persona a la vez. El impostor recibe otra instruccion y luego llega la votacion.</p>
+          <p>La ronda se reparte una persona a la vez. Solo si eliges modo impostor aparece la votacion al final.</p>
         </div>
       </article>
     </div>
@@ -597,7 +602,7 @@ function SetupScreen({
         </div>
       </SectionCard>
 
-      <SectionCard title="4. Jugadores" caption="La votacion funciona mejor desde tres personas.">
+      <SectionCard title="4. Jugadores" caption="La partida empieza desde 2 personas. El modo impostor sigue disponible, pero ya no es obligatorio.">
         <div className="rounded-[1.5rem] border border-brand-wine/10 bg-brand-cream/70 p-4">
           <div className="flex items-center justify-between gap-4">
             <button
@@ -836,56 +841,89 @@ function ResultScreen({
   votes
 }: {
   session: GameSession
-  summary: NonNullable<ReturnType<typeof summarizeVotes>>
+  summary: NonNullable<ReturnType<typeof summarizeVotes>> | null
   votes: Record<string, string>
 }) {
   const edition = editionMap[session.editionKey]
   const category = getCategory(session.editionKey, session.categoryKey)
+  const mode = gameModeMap[session.modeKey]
 
   return (
     <div className="space-y-5 pb-2">
-      <article className={cn('overflow-hidden rounded-[2rem] border p-5 shadow-soft', summary.caught ? 'border-[#7aa38e]/25 bg-gradient-to-br from-[#f6fbf6] via-[#f3f8f2] to-[#eff5ee]' : 'border-[#c9a17d]/25 bg-gradient-to-br from-[#fffaf4] via-[#f7eee3] to-[#f2e0d0]')}>
+      <article
+        className={cn(
+          'overflow-hidden rounded-[2rem] border p-5 shadow-soft',
+          session.hasImpostor
+            ? summary?.caught
+              ? 'border-[#7aa38e]/25 bg-gradient-to-br from-[#f6fbf6] via-[#f3f8f2] to-[#eff5ee]'
+              : 'border-[#c9a17d]/25 bg-gradient-to-br from-[#fffaf4] via-[#f7eee3] to-[#f2e0d0]'
+            : 'border-brand-wine/15 bg-gradient-to-br from-[#fffaf7] via-[#f6ede6] to-[#efded2]'
+        )}
+      >
         <p className="text-xs uppercase tracking-[0.34em] text-brand-violet">Resultado</p>
         <h2 className="mt-3 text-3xl font-semibold leading-tight text-brand-soft">
-          {summary.caught ? 'Lo encontraron.' : 'El impostor sobrevivio.'}
+          {session.hasImpostor ? (summary?.caught ? 'Lo encontraron.' : 'El impostor sobrevivio.') : 'La ronda quedo abierta.'}
         </h2>
         <p className="mt-4 text-base leading-7 text-[#5f534b]">
-          {summary.impostor?.name} era el impostor en {edition.title}. {summary.caught ? 'El grupo leyo bien la mesa.' : 'La duda quedo repartida y nadie lo cerro del todo.'}
+          {session.hasImpostor
+            ? `${summary?.impostor?.name} era el impostor en ${edition.title}. ${summary?.caught ? 'El grupo leyo bien la mesa.' : 'La duda quedo repartida y nadie lo cerro del todo.'}`
+            : `Terminaron una ronda de ${edition.title} en modo ${mode.label}. Ahora la idea es recoger lo que dejo la conversacion y cerrar con algo mas intimo.`}
         </p>
       </article>
 
       <article className="rounded-[1.9rem] border border-brand-wine/10 bg-white/92 p-5">
-        <p className="text-xs uppercase tracking-[0.34em] text-brand-violet">Pregunta real</p>
+        <p className="text-xs uppercase tracking-[0.34em] text-brand-violet">{session.hasImpostor ? 'Pregunta real' : 'Cartas de la ronda'}</p>
         <h3 className="mt-3 text-2xl font-semibold leading-tight text-brand-soft">{category.label}</h3>
-        <p className="mt-4 text-lg leading-8 text-brand-soft">{session.sharedCard.text}</p>
-      </article>
-
-      <article className="rounded-[1.9rem] border border-brand-wine/10 bg-white/92 p-5">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-xs uppercase tracking-[0.34em] text-brand-violet">Mapa de votos</p>
-          <span className="rounded-full border border-brand-wine/10 bg-brand-cream px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-brand-wine">
-            {Object.keys(votes).length} votos
-          </span>
-        </div>
-
-        <div className="mt-4 grid gap-3">
-          {summary.tallies.map((item) => (
-            <div key={item.playerId} className={cn('rounded-[1.4rem] border px-4 py-4', item.isImpostor ? 'border-brand-wine/20 bg-[#fff5f8]' : 'border-brand-wine/10 bg-brand-cream/50')}>
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-lg font-semibold text-brand-soft">{item.playerName}</p>
-                  <p className="mt-1 text-sm leading-6 text-[#655a53]">
-                    {item.isImpostor ? 'Era el impostor' : 'Jugador regular'}
-                  </p>
-                </div>
-                <span className="rounded-full bg-white px-3 py-2 text-sm font-semibold text-brand-wine shadow-sm">
-                  {item.votes} voto{item.votes === 1 ? '' : 's'}
-                </span>
+        {session.hasImpostor ? (
+          <p className="mt-4 text-lg leading-8 text-brand-soft">{session.roundPrompts[0]?.text}</p>
+        ) : (
+          <div className="mt-4 grid gap-3">
+            {session.players.map((player) => (
+              <div key={player.id} className="rounded-[1.4rem] border border-brand-wine/10 bg-brand-cream/50 px-4 py-4">
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-violet">{player.name}</p>
+                <p className="mt-3 text-base leading-7 text-brand-soft">{player.secretPrompt}</p>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </article>
+
+      {session.hasImpostor && summary ? (
+        <article className="rounded-[1.9rem] border border-brand-wine/10 bg-white/92 p-5">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs uppercase tracking-[0.34em] text-brand-violet">Mapa de votos</p>
+            <span className="rounded-full border border-brand-wine/10 bg-brand-cream px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-brand-wine">
+              {Object.keys(votes).length} votos
+            </span>
+          </div>
+
+          <div className="mt-4 grid gap-3">
+            {summary.tallies.map((item) => (
+              <div key={item.playerId} className={cn('rounded-[1.4rem] border px-4 py-4', item.isImpostor ? 'border-brand-wine/20 bg-[#fff5f8]' : 'border-brand-wine/10 bg-brand-cream/50')}>
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-lg font-semibold text-brand-soft">{item.playerName}</p>
+                    <p className="mt-1 text-sm leading-6 text-[#655a53]">
+                      {item.isImpostor ? 'Era el impostor' : 'Jugador regular'}
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-white px-3 py-2 text-sm font-semibold text-brand-wine shadow-sm">
+                    {item.votes} voto{item.votes === 1 ? '' : 's'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+      ) : (
+        <article className="rounded-[1.9rem] border border-brand-wine/10 bg-white/92 p-5">
+          <p className="text-xs uppercase tracking-[0.34em] text-brand-violet">Tono final</p>
+          <h3 className="mt-3 text-2xl font-semibold leading-tight text-brand-soft">{mode.resultTone}</h3>
+          <p className="mt-4 text-base leading-7 text-[#5f534b]">
+            Jugaron {session.players.length} personas y cada una entro a la ronda con una carta privada. Antes de cerrar, vale la pena preguntar que respuesta les dejo algo sonando por dentro.
+          </p>
+        </article>
+      )}
 
       <article className="overflow-hidden rounded-[1.9rem] border border-brand-wine/10 bg-gradient-to-br from-white via-[#f5ece4] to-[#eeded1] p-5">
         <p className="text-xs uppercase tracking-[0.34em] text-brand-violet">Pregunta de cierre</p>
@@ -903,13 +941,13 @@ function HowToOverlay({ onClose }: { onClose: () => void }) {
       <div className="w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/10 bg-[#fffaf6] shadow-soft">
         <div className="border-b border-brand-wine/10 px-5 py-4">
           <p className="text-xs uppercase tracking-[0.34em] text-brand-violet">Como jugar</p>
-          <h2 className="mt-3 text-2xl font-semibold text-brand-soft">Una sola pregunta. Una persona fuera de contexto.</h2>
+          <h2 className="mt-3 text-2xl font-semibold text-brand-soft">Una ronda privada, por turnos, con cierre emocional.</h2>
         </div>
         <div className="space-y-4 px-5 py-5 text-sm leading-7 text-[#5f534b]">
           <p>1. Configura edicion, modo, categoria y nombres.</p>
           <p>2. Pasa el celular para que cada persona vea su carta en privado.</p>
-          <p>3. La ronda empieza: todos hablan en su turno. El impostor improvisa.</p>
-          <p>4. Al final, cada jugador vota en secreto y la app revela si el grupo acerto.</p>
+          <p>3. La ronda empieza: cada jugador habla en su turno, sin mostrar su carta.</p>
+          <p>4. Si eliges modo impostor, al final aparece votacion. En los otros modos la app cierra la conversacion sin juego de sospecha.</p>
         </div>
         <div className="border-t border-brand-wine/10 px-5 py-4">
           <button

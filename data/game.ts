@@ -11,8 +11,8 @@ export type GameMode = {
   shortLabel: string
   description: string
   roundInstruction: string
-  impostorInstruction: string
   resultTone: string
+  usesImpostor: boolean
 }
 
 export type EditionVisual = {
@@ -42,7 +42,8 @@ export type GameSession = {
   editionKey: EditionKey
   modeKey: GameModeKey
   categoryKey: string
-  sharedCard: CardItem
+  hasImpostor: boolean
+  roundPrompts: CardItem[]
   closingCard: CardItem | null
   players: PlayerAssignment[]
 }
@@ -54,46 +55,46 @@ export type VoteSummary = {
   isImpostor: boolean
 }
 
-export const MIN_PLAYERS = 3
+export const MIN_PLAYERS = 2
 export const MAX_PLAYERS = 8
-export const DEFAULT_PLAYER_COUNT = 4
+export const DEFAULT_PLAYER_COUNT = 2
 
 export const gameModes: GameMode[] = [
   {
     key: 'conversation',
     label: 'Conversacion',
     shortLabel: 'Suave',
-    description: 'La ronda arranca ligera y emocional. Todo el grupo comparte desde la calma.',
-    roundInstruction: 'Hablen con calma, sin correr. La idea es sonar genuino, no perfecto.',
-    impostorInstruction: 'No tienes la pregunta exacta. Improvisa con honestidad sobre el tono de la categoria y mezcla tu respuesta con suavidad.',
-    resultTone: 'Cierre suave'
+    description: 'Cada persona recibe una carta propia y la ronda avanza por turnos, sin votacion ni roles ocultos.',
+    roundInstruction: 'Respondan con calma y escuchen sin interrumpir. Aqui importa la conversacion, no acertar nada.',
+    resultTone: 'Cierre suave',
+    usesImpostor: false
   },
   {
     key: 'impostor',
     label: 'Impostor',
     shortLabel: 'Clasico',
-    description: 'Una persona no conoce la pregunta real. El grupo debe detectarla al final.',
+    description: 'Todas las personas menos una ven la misma pregunta. Al final, el grupo vota quien improviso.',
     roundInstruction: 'Respondan como si conocieran bien la pregunta. Escuchen con atencion cada detalle.',
-    impostorInstruction: 'Eres el impostor. No conoces la pregunta real. Escucha, improvisa y trata de mezclarte.',
-    resultTone: 'Revelacion'
+    resultTone: 'Revelacion',
+    usesImpostor: true
   },
   {
     key: 'intense',
     label: 'Intenso',
     shortLabel: 'Profundo',
-    description: 'Misma dinamica, pero con respuestas mas directas, vulnerables y menos obvias.',
-    roundInstruction: 'Vayan al punto y compartan algo real. Entre mas honestidad, mas dificil sera esconderse.',
-    impostorInstruction: 'Eres el impostor. No conoces la pregunta real. Responde con profundidad sobre la categoria para no delatarte.',
-    resultTone: 'Cierre profundo'
+    description: 'Cada persona recibe una carta mas directa. La ronda busca respuestas mas honestas y menos superficiales.',
+    roundInstruction: 'Vayan al punto y digan algo real. No hace falta explicar todo, pero si dejar verdad.',
+    resultTone: 'Cierre profundo',
+    usesImpostor: false
   },
   {
     key: 'familiar',
     label: 'Familiar',
     shortLabel: 'Calido',
-    description: 'La ronda cuida el tono. Ideal para grupos mixtos o conversaciones que necesitan suavidad.',
-    roundInstruction: 'Hablen desde el cuidado. La idea es dejar una buena conversacion, no exponer a nadie.',
-    impostorInstruction: 'Eres el impostor. No conoces la pregunta real. Mantente cercano, amable y conectado al tema general.',
-    resultTone: 'Cierre calido'
+    description: 'Turnos privados con un tono cuidado. Ideal para jugar desde 2 personas sin que se sienta agresivo.',
+    roundInstruction: 'Hablen desde el cuidado. La ronda esta hecha para acercarse, no para presionarse.',
+    resultTone: 'Cierre calido',
+    usesImpostor: false
   }
 ]
 
@@ -129,7 +130,7 @@ export function createInitialSetup(): SetupState {
 
   return {
     editionKey: defaultEdition.key,
-    modeKey: 'impostor',
+    modeKey: 'conversation',
     categoryKey: defaultEdition.categories[0]?.key ?? '',
     playerCount: DEFAULT_PLAYER_COUNT,
     playerNames: syncPlayerNames(DEFAULT_PLAYER_COUNT, [])
@@ -150,16 +151,23 @@ export function createGameSession(setup: SetupState): GameSession {
   const mode = gameModeMap[setup.modeKey]
   const category = getCategory(setup.editionKey, setup.categoryKey)
   const categoryCards = edition.cards.filter((card) => card.category === category.key)
-  const sharedCard = pickRandom(categoryCards) ?? edition.cards[0]
-  const closingCard = pickRandom(categoryCards.filter((card) => card.id !== sharedCard.id)) ?? null
+  const promptPool = categoryCards.length ? categoryCards : edition.cards
   const normalizedNames = syncPlayerNames(setup.playerCount, setup.playerNames).map((name, index) => {
     const trimmed = name.trim()
     return trimmed || `Jugador ${index + 1}`
   })
-  const impostorIndex = Math.floor(Math.random() * normalizedNames.length)
+
+  const roundPrompts = mode.usesImpostor
+    ? [pickRandom(promptPool) ?? edition.cards[0]]
+    : pickCards(promptPool, normalizedNames.length, edition.cards)
+
+  const primaryPrompt = roundPrompts[0] ?? edition.cards[0]
+  const closingCard = pickClosingCard(promptPool, roundPrompts, edition.cards)
+  const impostorIndex = mode.usesImpostor ? Math.floor(Math.random() * normalizedNames.length) : -1
 
   const players = normalizedNames.map((name, index) => {
     const isImpostor = index === impostorIndex
+    const assignedPrompt = mode.usesImpostor ? primaryPrompt : roundPrompts[index] ?? primaryPrompt
 
     if (isImpostor) {
       return {
@@ -167,8 +175,8 @@ export function createGameSession(setup: SetupState): GameSession {
         name,
         isImpostor,
         secretTitle: `Rol secreto · ${mode.shortLabel}`,
-        secretPrompt: buildImpostorPrompt(category, mode),
-        privateHint: 'Escucha antes de hablar. Tu meta es sonar presente sin revelar que no viste la carta real.'
+        secretPrompt: buildImpostorPrompt(category),
+        privateHint: 'No viste la carta real. Escucha primero y responde con naturalidad para no regalarte.'
       }
     }
 
@@ -177,8 +185,8 @@ export function createGameSession(setup: SetupState): GameSession {
       name,
       isImpostor,
       secretTitle: `${edition.title} · ${category.label}`,
-      secretPrompt: sharedCard.text,
-      privateHint: 'Respira, guarda la pregunta para ti y responde con naturalidad cuando llegue tu turno.'
+      secretPrompt: assignedPrompt.text,
+      privateHint: buildPlayerHint(mode)
     }
   })
 
@@ -186,7 +194,8 @@ export function createGameSession(setup: SetupState): GameSession {
     editionKey: edition.key,
     modeKey: mode.key,
     categoryKey: category.key,
-    sharedCard,
+    hasImpostor: mode.usesImpostor,
+    roundPrompts,
     closingCard,
     players
   }
@@ -220,8 +229,55 @@ export function summarizeVotes(session: GameSession, votes: Record<string, strin
   }
 }
 
-function buildImpostorPrompt(category: EditionCategory, mode: GameMode) {
-  return `${mode.impostorInstruction} Habla desde ${category.label.toLowerCase()} y usa la descripcion general como brujula: ${category.description}`
+function buildImpostorPrompt(category: EditionCategory) {
+  return `No conoces la pregunta real. Improvisa desde ${category.label.toLowerCase()} y usa esta idea como brujula: ${category.description}`
+}
+
+function buildPlayerHint(mode: GameMode) {
+  if (mode.key === 'intense') {
+    return 'Ve a lo real. No hace falta decir mucho, pero si decir algo que tenga peso.'
+  }
+
+  if (mode.key === 'familiar') {
+    return 'Cuida el tono. Responde con honestidad, pero deja espacio para que la mesa se sienta segura.'
+  }
+
+  if (mode.key === 'conversation') {
+    return 'Guarda la carta para ti y responde con calma cuando llegue tu turno.'
+  }
+
+  return 'Respira, guarda la pregunta para ti y responde con naturalidad cuando llegue tu turno.'
+}
+
+function pickClosingCard(promptPool: CardItem[], roundPrompts: CardItem[], editionCards: CardItem[]) {
+  const usedPromptIds = new Set(roundPrompts.map((card) => card.id))
+  return (
+    pickRandom(promptPool.filter((card) => !usedPromptIds.has(card.id))) ??
+    pickRandom(editionCards.filter((card) => !usedPromptIds.has(card.id))) ??
+    null
+  )
+}
+
+function pickCards(primaryPool: CardItem[], count: number, fallbackPool: CardItem[]) {
+  const source = primaryPool.length ? [...primaryPool] : [...fallbackPool]
+  const shuffled = shuffle(source)
+
+  if (shuffled.length >= count) {
+    return shuffled.slice(0, count)
+  }
+
+  return Array.from({ length: count }, (_, index) => shuffled[index % shuffled.length] ?? fallbackPool[index % fallbackPool.length])
+}
+
+function shuffle<T>(items: T[]) {
+  const clone = [...items]
+
+  for (let index = clone.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1))
+    ;[clone[index], clone[randomIndex]] = [clone[randomIndex], clone[index]]
+  }
+
+  return clone
 }
 
 function pickRandom<T>(items: T[]) {
