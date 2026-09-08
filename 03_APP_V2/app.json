@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Uy Qué Heavy",
+    "slug": "uqh-app",
+    "version": "2.0.0",
+    "scheme": "uyqueheavy",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": { "backgroundColor": "#7A1E22", "resizeMode": "contain", "image": "./assets/splash-icon.png" },
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.uyqueheavy.app" },
+    "android": { "package": "com.uyqueheavy.app", "adaptiveIcon": { "backgroundColor": "#7A1E22", "foregroundImage": "./assets/android-icon-foreground.png" }, "predictiveBackGestureEnabled": false },
+    "web": { "bundler": "metro", "favicon": "./assets/favicon.png" },
+    "plugins": ["expo-router", "expo-font", "expo-status-bar"],
+    "experiments": { "typedRoutes": false }
+  }
+}

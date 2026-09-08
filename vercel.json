@@ -1,4 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs"
+  "framework": null,
+  "installCommand": "cd 03_APP_V2 && npm ci",
+  "buildCommand": "cd 03_APP_V2 && npx expo export -p web",
+  "outputDirectory": "03_APP_V2/dist",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
