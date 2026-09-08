@@ -103,8 +103,7 @@ export default function Play() {
             </View>
             <View style={styles.actions}>
               <BrandButton label="Otra pregunta" bg={t.card} color={t.onCard} onPress={otraPregunta} />
-              {/* Compartir en Instagram → Fase 2 del roadmap (§20). */}
-              <Text style={[styles.shareHint, { color: t.accent }]}>Compartir tu respuesta · próximamente</Text>
+              {/* Compartir en Instagram → Fase 2 del roadmap (§20). Sin aviso "próximamente": Apple lo rechaza (Guideline 2.1). */}
             </View>
           </>
         )}

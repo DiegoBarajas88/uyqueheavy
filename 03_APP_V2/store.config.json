@@ -1,0 +1,47 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "copyright": "2026 Uy Qué Heavy",
+    "advisory": {
+      "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+      "contests": "NONE",
+      "gamblingSimulated": "NONE",
+      "horrorOrFearThemes": "NONE",
+      "matureOrSuggestiveThemes": "INFREQUENT_OR_MILD",
+      "medicalOrTreatmentInformation": "NONE",
+      "profanityOrCrudeHumor": "INFREQUENT_OR_MILD",
+      "sexualContentGraphicAndNudity": "NONE",
+      "sexualContentOrNudity": "FREQUENT_OR_INTENSE",
+      "violenceCartoonOrFantasy": "NONE",
+      "violenceRealistic": "NONE",
+      "violenceRealisticProlongedGraphicOrSadistic": "NONE",
+      "gambling": false,
+      "unrestrictedWebAccess": false,
+      "kidsAgeBand": null,
+      "seventeenPlus": true
+    },
+    "categories": ["ENTERTAINMENT", "LIFESTYLE"],
+    "info": {
+      "es-MX": {
+        "title": "Uy Qué Heavy",
+        "subtitle": "Cartas para conversar de verdad",
+        "description": "Uy Qué Heavy es el juego de cartas que convierte cualquier reunión en una conversación que vale la pena.\n\nElige una edición, deja que la baraja escoja una pregunta y respóndela en voz alta. Sin puntos, sin ganadores: lo único que hay que hacer es contar la verdad.\n\nCINCO EDICIONES\n• Friends Edition — risas, recuerdos y verdades sin filtro con tus amigos.\n• Love Edition — para reconectar con tu pareja desde la vulnerabilidad.\n• Forever Edition — preguntas profundas para matrimonios y relaciones de largo plazo.\n• Family Edition — padres, hijos y hermanos conversando de verdad.\n• Storytime Edition — anécdotas e historias que hay que contar, para cualquier grupo.\n\nCÓMO SE JUEGA\n• Tres modos: cada uno responde, elige quién responde o todos responden.\n• La baraja escoge la pregunta por ti.\n• Sin repeticiones: la app recuerda qué preguntas ya salieron hoy.\n\nPENSADO PARA LA MESA\nUy Qué Heavy nació como un juego de cartas físico y llega a tu celular con más de 250 preguntas reales, escritas para provocar conversaciones honestas, divertidas y a veces incómodas. Por eso se llama así.\n\nSin cuentas, sin anuncios y sin recopilar tus datos.",
+        "keywords": ["conversacion", "preguntas", "cartas", "juego", "pareja", "amigos", "familia", "parejas", "charla", "reunion", "fiesta", "heavy"],
+        "releaseNotes": "Primera versión de Uy Qué Heavy en tu celular: 5 ediciones y más de 250 preguntas para conversar de verdad.",
+        "privacyPolicyUrl": "https://uyqueheavy.vercel.app/privacidad.html",
+        "supportUrl": "https://uyqueheavy.vercel.app/soporte.html",
+        "marketingUrl": "https://uyqueheavy.com"
+      }
+    },
+    "review": {
+      "firstName": "Diego Felipe",
+      "lastName": "Barajas",
+      "email": "contacto@diegobarajas.com",
+      "phone": "+57 000 000 0000",
+      "demoUsername": "",
+      "demoPassword": "",
+      "demoRequired": false,
+      "notes": "La app no requiere cuenta ni inicio de sesión. Todo el contenido está disponible sin pagar. Forever Edition contiene preguntas sobre intimidad en pareja dirigidas a adultos; por eso la clasificación 17+."
+    }
+  }
+}
