@@ -1,0 +1,12 @@
+# Lo que EAS NO debe subir al build (el repo git es la raíz; la app vive en 03_APP_V2)
+ANTIGUO ARCHIVO/
+01_RECURSOS_ERIKA/
+Claude outputs/
+Plantilla APP UQH/
+*.zip
+*.pdf
+.venv/
+.next/
+node_modules/
+03_APP_V2/dist/
+03_APP_V2/.expo/
