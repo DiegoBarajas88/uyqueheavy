@@ -3,7 +3,7 @@
 Este archivo es la ÚNICA lista de pasos para publicar. Claude la lleva y la actualiza.
 Leyenda: ✅ hecho · 🔄 en curso · ⬜ pendiente · 👤 lo hace Felipe · 🤖 lo hace Claude
 
-Última actualización: 2026-09-09
+Última actualización: 2026-09-09 (teléfono puesto)
 
 ---
 
@@ -15,7 +15,7 @@ Leyenda: ✅ hecho · 🔄 en curso · ⬜ pendiente · 👤 lo hace Felipe · �
 | A2 | Apple Developer Program activo | 👤 | ✅ (según Felipe) |
 | A3 | Google Play Console: crear cuenta y pagar USD 25 | 👤 | ⬜ → ver Bloque B |
 | A4 | Web desplegada en https://uyqueheavy.vercel.app (privacidad y soporte) | 🤖 | ✅ |
-| A5 | Teléfono real de contacto en `store.config.json` | 👤 pasa el número · 🤖 lo pone | ⬜ |
+| A5 | Teléfono real de contacto en `store.config.json` (+57 318 973 1434) | 🤖 | ✅ |
 
 ---
 
