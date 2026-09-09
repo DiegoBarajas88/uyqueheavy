@@ -64,8 +64,8 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 |---|------|-------|--------|
 | C1 | Entrar a https://appstoreconnect.apple.com (Apple ID appsdb123@gmail.com, equipo Viko Holdings LLC) | 👤 | ✅ |
 | C2 | App creada en App Store Connect: `Uy Qué Heavy`, vendedor Viko Holdings, SKU uqh-app-v2, ASC App ID 6810321248 | 👤 | ✅ |
-| C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | 🔄 **build 8** (2026-09-09) en curso: corrige que en iOS el mazo tapaba la carta revelada. Builds 5, 6 y 7 quedaron atrás |
-| C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS) | 🤖 | 🔄 build 8 se sube solo al terminar |
+| C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | ✅ **build 8** (2026-09-09): baraja física completa, revelado corregido en iOS. Builds 5, 6 y 7 quedaron atrás |
+| C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS) | 🤖 | ✅ build 8 subido 2026-09-09 17:50; Apple procesa y manda correo |
 | C5 | Ficha en App Store Connect, campo por campo → ver "Guía C5" abajo | 👤 | ⬜ |
 | C6 | Privacidad de la app: "No se recopilan datos" → incluido en Guía C5, pantalla 4 | 👤 | ⬜ |
 | C7 | TestFlight: probar el **build 8** en tu iPhone (revelado corregido). La web ya lo tiene en uyqueheavy.vercel.app | 👤 | 🔄 |
@@ -77,7 +77,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 
 | # | Paso | Quién | Estado |
 |---|------|-------|--------|
-| D1 | `eas build -p android --profile preview` → APK instalable directo en cualquier Android | 👤 | ✅ APK actual (2026-09-09): https://expo.dev/artifacts/eas/3pIkr__5oNo-bMnZdRXj-Zr4AN4tHfcKWNEnipdW9YY.apk |
+| D1 | `eas build -p android --profile preview` → APK instalable directo en cualquier Android | 🤖 | ✅ APK de la mañana (104 MB, sin baraja física) · 🔄 APK nuevo con baraja física en curso. Al instalar "app corrupta" = descarga incompleta: bajar por WiFi y abrir desde Archivos |
 | D2 | `eas build -p ios --profile preview` → requiere registrar el UDID de tu iPhone (EAS te guía con un link) | 👤 ejecuta | ⬜ |
 | D3 | Instalar en 2-3 celulares y jugar una ronda completa de cada edición | 👤 + Erika | ⬜ |
 
