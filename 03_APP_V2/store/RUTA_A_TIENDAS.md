@@ -65,9 +65,9 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 | C1 | Entrar a https://appstoreconnect.apple.com (Apple ID appsdb123@gmail.com, equipo Viko Holdings LLC) | 👤 | ✅ |
 | C2 | App creada en App Store Connect: `Uy Qué Heavy`, vendedor Viko Holdings, SKU uqh-app-v2, ASC App ID 6810321248 | 👤 | ✅ |
 | C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | ✅ hecho 2026-09-08, 2 builds FINISHED en EAS, certificados creados |
-| C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS). Build 3, v2.0.0 | 👤 | 🔄 enviado 2026-09-09, esperando procesamiento |
-| C5 | En App Store Connect: pegar ficha desde `store/APP_STORE_FICHA.md`, subir capturas 6.7", clasificación 17+, URLs de privacidad y soporte, info de contacto para revisión (aquí va el teléfono de A5) | 👤 | ⬜ |
-| C6 | Privacidad de la app: "No se recopilan datos" | 👤 | ⬜ |
+| C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS). Build 3, v2.0.0 | 👤 | ✅ subido 2026-09-09; Apple procesa 5-30 min y manda correo |
+| C5 | Ficha en App Store Connect, campo por campo → ver "Guía C5" abajo | 👤 | ⬜ |
+| C6 | Privacidad de la app: "No se recopilan datos" → incluido en Guía C5, pantalla 4 | 👤 | ⬜ |
 | C7 | TestFlight: probar en tu iPhone antes de enviar a revisión | 👤 | ⬜ |
 | C8 | Enviar a revisión. Apple tarda de 1 a 3 días | 👤 | ⬜ |
 
@@ -91,3 +91,54 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 - Ícono definitivo 1024×1024 — ⚠️ **el `assets/icon.png` actual sigue siendo el placeholder de Expo (la 'A' azul)**. Hay un provisional de marca en `assets_play/icono_1024_para_la_app.png` listo para reemplazarlo.
 
 Cuando lleguen, se actualizan datos y se publica una versión 2.0.1.
+
+---
+
+## Guía C5 — Ficha de App Store Connect, campo por campo
+
+Entrar a https://appstoreconnect.apple.com/apps/6810321248 . Todo lo que hay que pegar está en `store/APP_STORE_FICHA.md`.
+
+**Pantalla 1: pestaña "App Store" → versión "2.0.0 Preparar para enviar" (menú izquierdo)**
+
+| Campo | Qué poner |
+|---|---|
+| Vista previa y capturas de pantalla, iPhone 6.7" | Arrastrar las 5 imágenes de `store/screenshots/ios-6.7/` en orden 01 a 05 |
+| Texto promocional | (dejar vacío) |
+| Descripción | Pegar la "Descripción" completa de la ficha |
+| Palabras clave | `conversacion,preguntas,cartas,juego,pareja,amigos,familia,parejas,charla,reunion,fiesta,heavy` |
+| URL de soporte | `https://uyqueheavy.vercel.app/soporte.html` |
+| URL de marketing | `https://uyqueheavy.com` (o vacío si el dominio aún no carga) |
+| Compilación | Botón "+" o "Añadir compilación" → elegir **2.0.0 (3)**. Solo aparece cuando Apple terminó de procesar |
+| Cifrado | Si pregunta, "No" (ya viene declarado en el build) |
+| Copyright | `2026 Viko Holdings LLC` |
+| Información de contacto para la revisión | Nombre Diego Felipe · Apellido Barajas · Teléfono +57 318 973 1434 · Correo contacto@diegobarajas.com |
+| Inicio de sesión requerido | Desmarcar (no hay cuenta) |
+| Notas para la revisión | Pegar "Notas para el revisor" de la ficha |
+| Lanzamiento de la versión | "Lanzar esta versión manualmente" (así decidimos el día) |
+
+**Pantalla 2: menú izquierdo → "Información de la app"**
+
+| Campo | Qué poner |
+|---|---|
+| Nombre | `Uy Qué Heavy` |
+| Subtítulo | `Cartas para conversar de verdad` |
+| Categoría principal | Entretenimiento |
+| Categoría secundaria | Estilo de vida |
+| Clasificación de contenido | Botón "Editar" → cuestionario: Contenido sexual o desnudez = **Frecuente/Intenso**; Temas para adultos o sugerentes = **Poco frecuente/Moderado**; Lenguaje soez o humor grosero = **Poco frecuente/Moderado**; todo lo demás = Ninguno. Debe dar **17+** |
+| Derechos de contenido | "No contiene, muestra ni accede a contenido de terceros" |
+
+**Pantalla 3: menú izquierdo → "Precios y disponibilidad"**
+
+| Campo | Qué poner |
+|---|---|
+| Precio | Gratis (USD 0) |
+| Disponibilidad | Todos los países |
+
+**Pantalla 4: menú izquierdo → "Privacidad de la app"**
+
+| Campo | Qué poner |
+|---|---|
+| URL de política de privacidad | `https://uyqueheavy.vercel.app/privacidad.html` |
+| Prácticas de datos | Botón "Comenzar" → "No, no recopilamos datos de esta app" → Publicar |
+
+**Pantalla 5: volver a la versión 2.0.0 → botón "Guardar" y luego "Añadir para revisión" / "Enviar para revisión"** (paso C8). Antes de eso, probar en TestFlight (C7).
