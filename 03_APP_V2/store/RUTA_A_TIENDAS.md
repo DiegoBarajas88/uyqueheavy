@@ -77,7 +77,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 
 | # | Paso | Quién | Estado |
 |---|------|-------|--------|
-| D1 | `eas build -p android --profile preview` → APK instalable directo en cualquier Android | 👤 | ✅ APK del 2026-09-08 (sin el último cambio) · 🔄 nuevo APK en cola 2026-09-09 con el código actual |
+| D1 | `eas build -p android --profile preview` → APK instalable directo en cualquier Android | 👤 | ✅ APK actual (2026-09-09): https://expo.dev/artifacts/eas/3pIkr__5oNo-bMnZdRXj-Zr4AN4tHfcKWNEnipdW9YY.apk |
 | D2 | `eas build -p ios --profile preview` → requiere registrar el UDID de tu iPhone (EAS te guía con un link) | 👤 ejecuta | ⬜ |
 | D3 | Instalar en 2-3 celulares y jugar una ronda completa de cada edición | 👤 + Erika | ⬜ |
 
