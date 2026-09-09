@@ -281,10 +281,13 @@ function FlyingCard({
     Animated.multiply(wob, 4),
   ).interpolate({ inputRange: [-30, 30], outputRange: ['-30deg', '30deg'] });
   // una vuelta completa en el aire (360°) + 180° del revelado
-  const rotateY = Animated.add(Animated.multiply(p, 360), Animated.multiply(flip, 180)).interpolate({
-    inputRange: [0, 540],
-    outputRange: ['0deg', '540deg'],
-  });
+  const angle = Animated.add(Animated.multiply(p, 360), Animated.multiply(flip, 180));
+  const rotateY = angle.interpolate({ inputRange: [0, 540], outputRange: ['0deg', '540deg'] });
+  // Qué cara se ve, decidido por el ángulo (no por backfaceVisibility: el navegador no lo
+  // respeta en caras anidadas y mostraba el reverso en espejo). El frente va pre-espejado
+  // (scaleX -1) para leerse bien cuando la carta está a 180°.
+  const backOpacity = angle.interpolate({ inputRange: [0, 89.9, 90, 270, 270.1, 449.9, 450, 540], outputRange: [1, 1, 0, 0, 1, 1, 0, 0] });
+  const frontOpacity = angle.interpolate({ inputRange: [0, 89.9, 90, 270, 270.1, 449.9, 450, 540], outputRange: [0, 0, 1, 1, 0, 0, 1, 1] });
 
   // sombra en la mesa: se aleja y se aclara cuando la carta sube
   const shX = Animated.add(translateX, p.interpolate({ inputRange: lift, outputRange: flight.chosen ? [10, 32] : [10, 32, 10] }));
@@ -318,16 +321,16 @@ function FlyingCard({
           { transform: [{ perspective: 900 }, { translateX }, { translateY }, { rotateX }, { rotateZ }, { rotateY }, { scale }] },
         ]}
       >
-        {/* reverso (visible con rotateY 0) */}
-        <View style={styles.face}>
+        {/* reverso (visible entre -90° y 90°) */}
+        <Animated.View style={[styles.face, { opacity: backOpacity }]}>
           <PrintedCard editionId={editionId} width={cw} side="back" />
           <Animated.View style={[styles.gloss, { width: cw * 0.5, height: ch * 1.6, transform: [{ translateX: gloss }, { rotateZ: '18deg' }] }]} />
-        </View>
-        {/* frente (visible con rotateY 180) */}
-        <View style={[styles.face, { transform: [{ rotateY: '180deg' }] }]}>
+        </Animated.View>
+        {/* frente (visible entre 90° y 270°), pre-espejado */}
+        <Animated.View style={[styles.face, { opacity: frontOpacity, transform: [{ scaleX: -1 }] }]}>
           <PrintedCard editionId={editionId} width={cw} side="front" question={flight.chosen ? question : undefined} />
           <Animated.View style={[styles.gloss, { width: cw * 0.5, height: ch * 1.6, transform: [{ translateX: Animated.multiply(gloss, -1) }, { rotateZ: '18deg' }] }]} />
-        </View>
+        </Animated.View>
       </Animated.View>
     </>
   );
@@ -336,7 +339,7 @@ function FlyingCard({
 const styles = StyleSheet.create({
   stage: { flex: 1, width: '100%', overflow: 'hidden' },
   anchored: { position: 'absolute', top: '50%', left: '50%' },
-  face: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backfaceVisibility: 'hidden', overflow: 'hidden' },
+  face: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden' },
   gloss: { position: 'absolute', top: '-30%', left: 0, backgroundColor: 'rgba(255,255,255,0.16)' },
   floorShadow: { backgroundColor: '#2C1719' },
   stackShadow: {
