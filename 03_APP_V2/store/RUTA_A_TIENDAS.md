@@ -62,10 +62,10 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 
 | # | Paso | Quién | Estado |
 |---|------|-------|--------|
-| C1 | Entrar a https://appstoreconnect.apple.com con el Apple ID del Developer Program | 👤 | ⬜ |
-| C2 | Apps → **+** → Nueva app. Plataforma iOS · Nombre `Uy Qué Heavy` · Idioma principal Español (México) · Bundle ID `com.uyqueheavy.app` (si no aparece, EAS lo registra en el paso C3) · SKU `uqh-app-v2` | 👤 | ⬜ |
+| C1 | Entrar a https://appstoreconnect.apple.com (Apple ID appsdb123@gmail.com, equipo Viko Holdings LLC) | 👤 | ✅ |
+| C2 | App creada en App Store Connect: `Uy Qué Heavy`, vendedor Viko Holdings, SKU uqh-app-v2, ASC App ID 6810321248 | 👤 | ✅ |
 | C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | ✅ hecho 2026-09-08, 2 builds FINISHED en EAS, certificados creados |
-| C4 | Subir el build: `eas submit -p ios --latest` (pide Apple ID y contraseña específica de app de https://appleid.apple.com) | 🤖 dirige · 👤 ejecuta | ⬜ |
+| C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS). Build 3, v2.0.0 | 👤 | 🔄 enviado 2026-09-09, esperando procesamiento |
 | C5 | En App Store Connect: pegar ficha desde `store/APP_STORE_FICHA.md`, subir capturas 6.7", clasificación 17+, URLs de privacidad y soporte, info de contacto para revisión (aquí va el teléfono de A5) | 👤 | ⬜ |
 | C6 | Privacidad de la app: "No se recopilan datos" | 👤 | ⬜ |
 | C7 | TestFlight: probar en tu iPhone antes de enviar a revisión | 👤 | ⬜ |
