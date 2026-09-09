@@ -54,4 +54,4 @@ La app no requiere cuenta ni inicio de sesión. Todo el contenido está disponib
 Para Android sirven las mismas (mín. 2, máx. 8, entre 320 y 3840 px) más un gráfico de funciones 1024×500 que falta diseñar.
 
 ## Ícono
-`assets/icon.png` (1024×1024). Pendiente el definitivo de Erika.
+`assets/icon.png` (1024×1024), provisional: marca de texto "UY QUÉ HEAVY" sobre vino, generado por `scripts/make_brand_assets.py`. Pendiente el definitivo de Erika. Para Google Play: `store/play/icon-512.png` y `store/play/feature-1024x500.png`.

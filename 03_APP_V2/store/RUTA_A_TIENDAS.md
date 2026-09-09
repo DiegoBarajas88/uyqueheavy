@@ -64,11 +64,11 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 |---|------|-------|--------|
 | C1 | Entrar a https://appstoreconnect.apple.com (Apple ID appsdb123@gmail.com, equipo Viko Holdings LLC) | 👤 | ✅ |
 | C2 | App creada en App Store Connect: `Uy Qué Heavy`, vendedor Viko Holdings, SKU uqh-app-v2, ASC App ID 6810321248 | 👤 | ✅ |
-| C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | ✅ hecho 2026-09-08, 2 builds FINISHED en EAS, certificados creados |
+| C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | ✅ build 3 (2026-09-08) · ⬜ **build 4 pendiente** con íconos de marca (el 3 lleva el ícono de plantilla de Expo) |
 | C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS). Build 3, v2.0.0 | 👤 | ✅ subido 2026-09-09; Apple procesa 5-30 min y manda correo |
 | C5 | Ficha en App Store Connect, campo por campo → ver "Guía C5" abajo | 👤 | ⬜ |
 | C6 | Privacidad de la app: "No se recopilan datos" → incluido en Guía C5, pantalla 4 | 👤 | ⬜ |
-| C7 | TestFlight: probar en tu iPhone antes de enviar a revisión. Invitación recibida 2026-09-09 13:52 | 👤 | 🔄 |
+| C7 | TestFlight: probar en tu iPhone antes de enviar a revisión. Invitación recibida 2026-09-09 13:52 (build 3, ícono de plantilla; el build 4 llegará solo a TestFlight) | 👤 | 🔄 |
 | C8 | Enviar a revisión. Apple tarda de 1 a 3 días | 👤 | ⬜ |
 
 ---
@@ -88,7 +88,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 - Hojas definitivas del Excel, columna F de Friends, filtro J/F de Family
 - Copies / jaculatorias definitivas
 - Colores Family y Storytime
-- Ícono definitivo 1024×1024 — ⚠️ **el `assets/icon.png` actual sigue siendo el placeholder de Expo (la 'A' azul)**. Hay un provisional de marca en `assets_play/icono_1024_para_la_app.png` listo para reemplazarlo.
+- Ícono definitivo 1024×1024 (mientras tanto: provisional generado por `scripts/make_brand_assets.py`, marca de texto sobre vino) — ⚠️ **el `assets/icon.png` actual sigue siendo el placeholder de Expo (la 'A' azul)**. Hay un provisional de marca en `assets_play/icono_1024_para_la_app.png` listo para reemplazarlo.
 
 Cuando lleguen, se actualizan datos y se publica una versión 2.0.1.
 

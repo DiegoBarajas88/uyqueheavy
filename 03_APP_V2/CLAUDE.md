@@ -25,6 +25,7 @@ npx expo start    # menú con QR para Expo Go en tu teléfono
   - `edition/[id].tsx` — Pantalla de edición (§6).
   - `play/[id].tsx` — Flujo Jugar: barajado → pregunta → otra pregunta (§7–12).
 - `src/data/editions.ts` — **ÚNICA FUENTE DE VERDAD DEL CONTENIDO** (§16). **Archivo generado**: no editar a mano. Preguntas → editar el Excel en `../01_RECURSOS_ERIKA/bancos_preguntas/` y correr `python3 scripts/import_questions.py`. Copies/jaculatorias → editar `META` en ese script.
+- `scripts/make_brand_assets.py` — genera ícono iOS/Android, splash nativo, favicon y gráficos de Google Play con la marca de texto (PROVISIONAL hasta el ícono de Erika). Spicy Wasabi no tiene É: la tilde se dibuja a mano.
 - `scripts/import_questions.py` — importador Excel → TS (requiere `pip install openpyxl`). Regla de IDs: `<edicion>_<fila Excel>`; nunca renumerar.
 - `src/theme/theme.ts` — sistema de marca: colores por edición, tipografías, layout.
 - `src/lib/storage.ts` — sistema anti-repetición diario con AsyncStorage (§9–10). Aquí irá el contador Freemium (§30) en Fase 3.
