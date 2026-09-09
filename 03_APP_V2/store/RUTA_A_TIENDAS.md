@@ -77,7 +77,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 
 | # | Paso | Quién | Estado |
 |---|------|-------|--------|
-| D1 | `eas build -p android --profile preview` → APK instalable directo en cualquier Android | 🤖 | ✅ APK de la mañana (104 MB, sin baraja física) · 🔄 APK nuevo con baraja física en curso. Al instalar "app corrupta" = descarga incompleta: bajar por WiFi y abrir desde Archivos |
+| D1 | `eas build -p android --profile preview` → APK instalable directo en cualquier Android | 🤖 | ✅ APK con baraja física (2026-09-09 17:45): https://expo.dev/artifacts/eas/hDTPdM_sSol3IDMObiL05r1fLnBDxQeeRExSNmg_8O0.apk · Play Protect bloquea: tocar "Instalar de todas formas"; si dice "No se ha instalado": verificar tamaño 104 MB, espacio libre y reiniciar |
 | D2 | `eas build -p ios --profile preview` → requiere registrar el UDID de tu iPhone (EAS te guía con un link) | 👤 ejecuta | ⬜ |
 | D3 | Instalar en 2-3 celulares y jugar una ronda completa de cada edición | 👤 + Erika | ⬜ |
 
