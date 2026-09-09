@@ -66,6 +66,7 @@ export default function CardDeckDraw({ editionId, question, theme, onRevealed }:
       // al revelar, la carta baja al centro de la mesa y crece hasta casi todo el ancho
       revealShift: stage.h * 0.1,
       revealScale: Math.min(stage.w * 0.92, (stage.h - 8) * CARD_RATIO) / (cw * 1.28),
+      revealWidth: Math.min(stage.w * 0.92, (stage.h - 8) * CARD_RATIO),
     };
   }, [stage]);
 
@@ -145,9 +146,13 @@ export default function CardDeckDraw({ editionId, question, theme, onRevealed }:
     setPile((p) => [...p, f.tilt1].slice(-PILE_MAX));
   }, []);
 
+  // Al terminar el giro, la carta en vuelo (con rotación 3D) se reemplaza por una vista
+  // plana en la misma posición y tamaño. iOS ordena mal las capas giradas en 3D y dibujaba
+  // el mazo y la pila encima de la carta revelada; en reposo no debe depender de eso.
   const onChosenRevealed = useCallback(() => {
     if (phase.current === 'done') return;
     phase.current = 'done';
+    setFlights((list) => list.filter((x) => !x.chosen));
     setRevealed(true);
     onRevealed();
   }, [onRevealed]);
@@ -177,6 +182,18 @@ export default function CardDeckDraw({ editionId, question, theme, onRevealed }:
               haptic={haptic}
             />
           ))}
+          {revealed && (
+            <View
+              pointerEvents="none"
+              style={[
+                styles.anchored,
+                styles.chosenShadow,
+                { zIndex: 3, width: geo.revealWidth, height: geo.revealWidth / CARD_RATIO, marginLeft: -geo.revealWidth / 2, marginTop: -geo.revealWidth / CARD_RATIO / 2 },
+              ]}
+            >
+              <PrintedCard editionId={editionId} width={geo.revealWidth} side="front" question={question} />
+            </View>
+          )}
           {!revealed && (
             <Text style={[styles.hint, { color: theme.accent, opacity: hintOn ? 0.9 : 0 }]}>Toca la mesa para detener</Text>
           )}
@@ -197,7 +214,7 @@ function Stack({
       pointerEvents="none"
       style={[
         styles.anchored,
-        { width: cw, height: ch, marginLeft: -cw / 2, marginTop: -ch / 2 },
+        { width: cw, height: ch, marginLeft: -cw / 2, marginTop: -ch / 2, zIndex: 0 },
         { transform: [{ perspective: 900 }, { translateX: pos.x }, { translateY: pos.y }, { rotateX: '38deg' }, { rotateZ: `${tilt}deg` }] },
       ]}
     >
@@ -220,7 +237,7 @@ function FlyingCard({
   flight: Flight;
   editionId: string;
   question: string;
-  geo: { cw: number; ch: number; deck: { x: number; y: number }; pile: { x: number; y: number }; apex: { x: number; y: number }; ctrlY: number; revealShift: number; revealScale: number };
+  geo: { cw: number; ch: number; deck: { x: number; y: number }; pile: { x: number; y: number }; apex: { x: number; y: number }; ctrlY: number; revealShift: number; revealScale: number; revealWidth: number };
   onLanded: (f: Flight) => void;
   onRevealed: () => void;
   haptic: (k: 'tick' | 'land') => void;
