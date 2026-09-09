@@ -68,7 +68,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 | C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS). Build 3, v2.0.0 | 👤 | ✅ subido 2026-09-09; Apple procesa 5-30 min y manda correo |
 | C5 | Ficha en App Store Connect, campo por campo → ver "Guía C5" abajo | 👤 | ⬜ |
 | C6 | Privacidad de la app: "No se recopilan datos" → incluido en Guía C5, pantalla 4 | 👤 | ⬜ |
-| C7 | TestFlight: probar en tu iPhone antes de enviar a revisión | 👤 | ⬜ |
+| C7 | TestFlight: probar en tu iPhone antes de enviar a revisión. Invitación recibida 2026-09-09 13:52 | 👤 | 🔄 |
 | C8 | Enviar a revisión. Apple tarda de 1 a 3 días | 👤 | ⬜ |
 
 ---
