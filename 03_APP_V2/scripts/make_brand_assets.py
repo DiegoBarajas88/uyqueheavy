@@ -133,7 +133,7 @@ def play_store_graphics():
     d = ImageDraw.Draw(fg)
     d.ellipse((700, -260, 1200, 240), fill=WINE_SOFT)
     d.ellipse((-160, 330, 260, 750), fill=WINE_SOFT)
-    draw_wordline(fg, (112, 120, 912, 300))
+    draw_wordline(fg, (160, 110, 864, 290))
     sub = ImageFont.truetype(os.path.join(ROOT, 'assets/fonts/Sieroty.ttf'), 58)
     text = 'Conectando un mundo desconectado'
     l, t, r, b = d.textbbox((0, 0), text, font=sub)
