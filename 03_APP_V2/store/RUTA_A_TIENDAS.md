@@ -64,11 +64,11 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 |---|------|-------|--------|
 | C1 | Entrar a https://appstoreconnect.apple.com (Apple ID appsdb123@gmail.com, equipo Viko Holdings LLC) | 👤 | ✅ |
 | C2 | App creada en App Store Connect: `Uy Qué Heavy`, vendedor Viko Holdings, SKU uqh-app-v2, ASC App ID 6810321248 | 👤 | ✅ |
-| C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | ✅ **build 7** (2026-09-09): ícono UQH + baraja física (cartas reales, toque para detener, vibración, carta grande al revelar). Builds 5 y 6 quedaron atrás |
-| C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS) | 🤖 | ✅ build 7 subido 2026-09-09 17:20; Apple procesa y manda correo |
+| C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | 🔄 **build 8** (2026-09-09) en curso: corrige que en iOS el mazo tapaba la carta revelada. Builds 5, 6 y 7 quedaron atrás |
+| C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS) | 🤖 | 🔄 build 8 se sube solo al terminar |
 | C5 | Ficha en App Store Connect, campo por campo → ver "Guía C5" abajo | 👤 | ⬜ |
 | C6 | Privacidad de la app: "No se recopilan datos" → incluido en Guía C5, pantalla 4 | 👤 | ⬜ |
-| C7 | TestFlight: probar el **build 7** en tu iPhone. La web ya lo tiene en uyqueheavy.vercel.app | 👤 | 🔄 |
+| C7 | TestFlight: probar el **build 8** en tu iPhone (revelado corregido). La web ya lo tiene en uyqueheavy.vercel.app | 👤 | 🔄 |
 | C8 | Enviar a revisión. Apple tarda de 1 a 3 días | 👤 | ⬜ |
 
 ---
