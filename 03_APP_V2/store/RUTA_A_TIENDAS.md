@@ -88,7 +88,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 - Hojas definitivas del Excel, columna F de Friends, filtro J/F de Family
 - Copies / jaculatorias definitivas
 - Colores Family y Storytime
-- Ícono definitivo 1024×1024 (mientras tanto: provisional generado por `scripts/make_brand_assets.py`, marca de texto sobre vino) — ⚠️ **el `assets/icon.png` actual sigue siendo el placeholder de Expo (la 'A' azul)**. Hay un provisional de marca en `assets_play/icono_1024_para_la_app.png` listo para reemplazarlo.
+- Ícono definitivo 1024×1024 (mientras tanto: monograma UQH generado por `scripts/make_brand_assets.py`) — ⚠️ **el `assets/icon.png` actual sigue siendo el placeholder de Expo (la 'A' azul)**. Hay un provisional de marca en `assets_play/icono_1024_para_la_app.png` listo para reemplazarlo.
 
 Cuando lleguen, se actualizan datos y se publica una versión 2.0.1.
 

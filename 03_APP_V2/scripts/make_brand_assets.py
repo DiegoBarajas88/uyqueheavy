@@ -89,25 +89,35 @@ def draw_wordmark(img, box, color=CREAM, gap_ratio=0.17):
         y += hh + gap
 
 
+def draw_monogram(img, box, color=CREAM):
+    """'UQH' centrado en box. Ícono de app: monograma para que la gente lo asocie."""
+    d = ImageDraw.Draw(img)
+    x0, y0, x1, y1 = box
+    font = fit_font(d, 'UQH', x1 - x0, start=700)
+    l, t, r, b = d.textbbox((0, 0), 'UQH', font=font)
+    x = x0 + ((x1 - x0) - (r - l)) // 2 - l
+    y = y0 + ((y1 - y0) - (b - t)) // 2 - t
+    d.text((x, y), 'UQH', font=font, fill=color)
+
+
 def icon_1024():
     img = Image.new('RGB', (1024, 1024), WINE)
     d = ImageDraw.Draw(img)
-    # Círculos suaves como en el splash de Erika
-    d.ellipse((560, -380, 1300, 360), fill=WINE_SOFT)
-    d.ellipse((-330, 720, 330, 1380), fill=WINE_SOFT)
-    draw_wordmark(img, (150, 190, 874, 834))
+    # Marco fino redondeado (como el boceto de Felipe)
+    d.rounded_rectangle((70, 70, 953, 953), radius=90, outline=CREAM, width=9)
+    draw_monogram(img, (150, 150, 874, 874))
     img.save(os.path.join(OUT, 'icon.png'), optimize=True)
 
 
 def android_foreground():
     # Adaptive icon: 1024 canvas, zona segura = círculo central de 66% (≈676px)
     img = Image.new('RGBA', (1024, 1024), (0, 0, 0, 0))
-    draw_wordmark(img, (230, 250, 794, 774))
+    draw_monogram(img, (250, 250, 774, 774))
     img.save(os.path.join(OUT, 'android-icon-foreground.png'), optimize=True)
     bg = Image.new('RGBA', (1024, 1024), WINE + (255,))
     bg.save(os.path.join(OUT, 'android-icon-background.png'), optimize=True)
     mono = Image.new('RGBA', (1024, 1024), (0, 0, 0, 0))
-    draw_wordmark(mono, (230, 250, 794, 774), color=(255, 255, 255))
+    draw_monogram(mono, (250, 250, 774, 774), color=(255, 255, 255))
     mono.save(os.path.join(OUT, 'android-icon-monochrome.png'), optimize=True)
 
 
@@ -120,7 +130,7 @@ def splash_icon():
 
 def favicon():
     img = Image.new('RGB', (256, 256), WINE)
-    draw_wordmark(img, (30, 40, 226, 216))
+    draw_monogram(img, (24, 24, 232, 232))
     img.resize((64, 64), Image.LANCZOS).save(os.path.join(OUT, 'favicon.png'), optimize=True)
 
 
