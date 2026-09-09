@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, Animated, Easing, StyleSheet, useWindowDimensions } from 'react-native';
-import { fonts, EditionTheme, scriptLineHeight, scriptSidePadding } from '../theme/theme';
-import PlayingCard from './PlayingCard';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, Animated, Easing, StyleSheet, Pressable, Platform, LayoutChangeEvent } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { fonts, EditionTheme } from '../theme/theme';
+import PrintedCard, { CARD_RATIO } from './PrintedCard';
 
 type Props = {
-  editionName: string;
-  tagline: string;
+  editionId: string;
   /** La pregunta YA seleccionada por la lógica anti-repetición. */
   question: string;
   theme: EditionTheme;
@@ -14,199 +14,358 @@ type Props = {
 };
 
 /**
- * Animación de selección de carta (spec de Erika). Simula una baraja física:
+ * Baraja física sobre la mesa (prototipo aprobado por Erika, 2026-09-09).
  *
- *   0.0–1.5s  cartas de la edición pasando rápido de DERECHA a IZQUIERDA
- *   1.5–2.5s  desaceleración progresiva (ease-out)
- *   2.5–3.0s  una carta queda detenida y de frente al usuario
- *   3.0–3.3s  esa carta se eleva, separándose de la baraja
- *   3.3–3.8s  giro 3D de 180° sobre el eje vertical
- *   3.8s      queda de frente mostrando la pregunta
+ *   mazo (abajo-izq, boca abajo, con canto)  →  cartas vuelan en arco dando una vuelta
+ *   en el aire  →  caen boca abajo en la pila (abajo-der). Arranca lento, llega a 8
+ *   cartas/s. A los 2.3 s frena solo; si el jugador toca la mesa antes, frena en ese
+ *   instante: salen 4 cartas más, cada una más lenta, y la quinta es la elegida.
+ *   La elegida sube al centro, queda flotando boca abajo con un balanceo, crece y gira
+ *   180° para revelar la pregunta.
  *
- * REGLA FUNDAMENTAL: la pregunta se elige ANTES de montar este componente y
- * llega por props. La carta que se detiene es siempre esa pregunta — la
- * animación nunca elige una carta y luego le asigna otra.
+ * REGLA FUNDAMENTAL: la pregunta llega por props, elegida ANTES de animar. El toque
+ * cambia cuándo frena, nunca qué sale.
  *
- * Geometría: todas las cartas se anclan al CENTRO del escenario
- * (left/top 50% + margen negativo de media carta) y se separan con
- * translateX. Así el mazo entero se mueve con un solo translateX animado.
+ * Todo corre con Animated + native driver (solo transforms y opacity).
  */
 
-const PASSING = 7;         // cartas que desfilan antes de la elegida
-const CARD_RATIO = 0.62;   // mismo naipe que PlayingCard
-const TILT = '-26deg';     // perfil de las cartas en movimiento
+const RATE = 8;            // cartas/s a plena velocidad
+const RAMP = 350;          // ms hasta velocidad plena
+const AUTO_STOP = 2300;    // ms: si nadie tocó, frena solo
+const MIN_TAP = 450;       // ms: antes de esto el toque se ignora
+const FLIGHT = 500;        // ms de vuelo de una carta
+const BRAKE = [160, 270, 420, 660]; // intervalos crecientes al frenar; luego la elegida
+const DECK_SHEETS = 14;
+const PILE_MAX = 26;
 
-export default function CardDeckDraw({ editionName, tagline, question, theme, onRevealed }: Props) {
-  const { width, height } = useWindowDimensions();
+type Flight = { id: number; chosen: boolean; tilt1: number; front: boolean };
 
-  const cardW = Math.min(width - 96, (height - 320) * CARD_RATIO, 280);
-  const cardH = cardW / CARD_RATIO;
-  const spacing = cardW * 0.58;              // superposición: se ve el canto de la de atrás
-  const startX = spacing * 1.5;              // el mazo entra desde la derecha
-  const endX = -spacing * PASSING;           // al final, la elegida queda centrada
+export default function CardDeckDraw({ editionId, question, theme, onRevealed }: Props) {
+  const [stage, setStage] = useState({ w: 0, h: 0 });
+  const [flights, setFlights] = useState<Flight[]>([]);
+  const [pile, setPile] = useState<number[]>([]);
+  const [dealt, setDealt] = useState(0);
+  const [hintOn, setHintOn] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
-  const scroll = useRef(new Animated.Value(0)).current;
-  const settle = useRef(new Animated.Value(0)).current;
-  const lift = useRef(new Animated.Value(0)).current;
-  const flip = useRef(new Animated.Value(0)).current;
-  const done = useRef(false);
+  const phase = useRef<'idle' | 'spin' | 'brake' | 'chosen' | 'done'>('idle');
+  const t0 = useRef(0);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const brakeIdx = useRef(-1);
+  const nextId = useRef(1);
+
+  const geo = useMemo(() => {
+    const cw = Math.min(stage.w * 0.4, 170);
+    return {
+      cw,
+      ch: cw / CARD_RATIO,
+      deck: { x: -stage.w * 0.27, y: stage.h * 0.19 },
+      pile: { x: stage.w * 0.27, y: stage.h * 0.19 },
+      apex: { x: 0, y: -stage.h * 0.1 },
+      ctrlY: -stage.h * 0.1 - stage.h * 0.22,
+    };
+  }, [stage]);
+
+  const haptic = useCallback((kind: 'tick' | 'land') => {
+    if (Platform.OS === 'web') return;
+    (kind === 'tick' ? Haptics.selectionAsync() : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)).catch(() => {});
+  }, []);
+
+  const launch = useCallback(
+    (chosen: boolean) => {
+      setFlights((f) => [...f, { id: nextId.current++, chosen, tilt1: Math.random() * 16 - 8, front: !chosen }]);
+      setDealt((d) => d + 1);
+      haptic('tick');
+    },
+    [haptic],
+  );
+
+  const schedule = useCallback((ms: number, fn: () => void) => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(fn, ms);
+  }, []);
+
+  const brakeStep = useCallback(() => {
+    brakeIdx.current += 1;
+    if (brakeIdx.current < BRAKE.length) {
+      launch(false);
+      schedule(BRAKE[brakeIdx.current], brakeStep);
+    } else {
+      phase.current = 'chosen';
+      launch(true);
+    }
+  }, [launch, schedule]);
+
+  const requestStop = useCallback(() => {
+    if (phase.current !== 'spin') return;
+    phase.current = 'brake';
+    setHintOn(false);
+    brakeIdx.current = -1;
+    schedule(50, brakeStep);
+  }, [brakeStep, schedule]);
+
+  const spinStep = useCallback(() => {
+    if (phase.current !== 'spin') return;
+    const t = Date.now() - t0.current;
+    if (t >= AUTO_STOP) {
+      requestStop();
+      return;
+    }
+    launch(false);
+    const ramp = Math.min(1, t / RAMP);
+    const rate = RATE * (0.25 + 0.75 * (1 - Math.pow(1 - ramp, 2)));
+    schedule(1000 / rate, spinStep);
+  }, [launch, requestStop, schedule]);
+
+  // Arranque: cuando ya conocemos el tamaño del escenario.
+  useEffect(() => {
+    if (!stage.w || phase.current !== 'idle') return;
+    phase.current = 'spin';
+    t0.current = Date.now();
+    const hint = setTimeout(() => setHintOn(true), 500);
+    schedule(0, spinStep);
+    return () => {
+      clearTimeout(hint);
+      if (timer.current) clearTimeout(timer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage.w]);
+
+  const onTap = useCallback(() => {
+    if (phase.current !== 'spin') return;
+    if (Date.now() - t0.current < MIN_TAP) return;
+    requestStop();
+  }, [requestStop]);
+
+  const onLanded = useCallback((f: Flight) => {
+    setFlights((list) => list.filter((x) => x.id !== f.id));
+    setPile((p) => [...p, f.tilt1].slice(-PILE_MAX));
+  }, []);
+
+  const onChosenRevealed = useCallback(() => {
+    if (phase.current === 'done') return;
+    phase.current = 'done';
+    setRevealed(true);
+    onRevealed();
+  }, [onRevealed]);
+
+  const onLayout = (e: LayoutChangeEvent) => {
+    const { width, height } = e.nativeEvent.layout;
+    if (width !== stage.w || height !== stage.h) setStage({ w: width, h: height });
+  };
+
+  const deckSheets = Math.max(3, DECK_SHEETS - Math.floor(dealt / 2));
+
+  return (
+    <Pressable style={styles.stage} onLayout={onLayout} onPress={onTap} accessibilityLabel="Mesa de juego; toca para detener la baraja">
+      {stage.w > 0 && (
+        <>
+          <Stack editionId={editionId} pos={geo.deck} tilt={-6} sheets={deckSheets} cw={geo.cw} ch={geo.ch} />
+          <Stack editionId={editionId} pos={geo.pile} tilt={5} sheets={pile.length} tilts={pile} cw={geo.cw} ch={geo.ch} />
+          {flights.map((f) => (
+            <FlyingCard
+              key={f.id}
+              flight={f}
+              editionId={editionId}
+              question={question}
+              geo={geo}
+              onLanded={onLanded}
+              onRevealed={onChosenRevealed}
+              haptic={haptic}
+            />
+          ))}
+          {!revealed && (
+            <Text style={[styles.hint, { color: theme.accent, opacity: hintOn ? 0.9 : 0 }]}>Toca la mesa para detener</Text>
+          )}
+        </>
+      )}
+    </Pressable>
+  );
+}
+
+/* ---------- mazo / pila: cartas apiladas con canto visible ---------- */
+function Stack({
+  editionId, pos, tilt, sheets, tilts, cw, ch,
+}: { editionId: string; pos: { x: number; y: number }; tilt: number; sheets: number; tilts?: number[]; cw: number; ch: number }) {
+  if (sheets <= 0) return null;
+  const r = cw * 0.05;
+  return (
+    <View
+      pointerEvents="none"
+      style={[
+        styles.anchored,
+        { width: cw, height: ch, marginLeft: -cw / 2, marginTop: -ch / 2 },
+        { transform: [{ perspective: 900 }, { translateX: pos.x }, { translateY: pos.y }, { rotateX: '38deg' }, { rotateZ: `${tilt}deg` }] },
+      ]}
+    >
+      {/* sombra de contacto del mazo sobre la mesa */}
+      <View style={[styles.stackShadow, { borderRadius: r, width: cw, height: ch }]} />
+      {Array.from({ length: sheets }).map((_, i) => (
+        <View key={i} style={[StyleSheet.absoluteFill, { transform: [{ translateY: -i * 1.15 }, { rotateZ: `${tilts ? tilts[i] - tilt : 0}deg` }] }]}>
+          <View style={[styles.sheetEdge, { borderRadius: r }]} />
+          <PrintedCard editionId={editionId} width={cw} side="back" />
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/* ---------- una carta en vuelo (o la elegida) ---------- */
+function FlyingCard({
+  flight, editionId, question, geo, onLanded, onRevealed, haptic,
+}: {
+  flight: Flight;
+  editionId: string;
+  question: string;
+  geo: { cw: number; ch: number; deck: { x: number; y: number }; pile: { x: number; y: number }; apex: { x: number; y: number }; ctrlY: number };
+  onLanded: (f: Flight) => void;
+  onRevealed: () => void;
+  haptic: (k: 'tick' | 'land') => void;
+}) {
+  const p = useRef(new Animated.Value(0)).current;     // progreso del vuelo (eased para la elegida)
+  const flip = useRef(new Animated.Value(0)).current;  // 0..1 giro de revelado
+  const wob = useRef(new Animated.Value(0)).current;   // balanceo al quedar flotando
+  const { cw, ch } = geo;
+
+  // Trayectoria: Bézier cuadrática mazo → (encima del centro) → pila, muestreada en 21 puntos.
+  const path = useMemo(() => {
+    const N = 20;
+    const input: number[] = [], xs: number[] = [], ys: number[] = [];
+    for (let i = 0; i <= N; i++) {
+      const u = flight.chosen ? (i / N) * 0.5 : i / N; // la elegida solo recorre la mitad: se queda en el centro
+      const x = (1 - u) * (1 - u) * geo.deck.x + 2 * (1 - u) * u * geo.apex.x + u * u * geo.pile.x;
+      const y = (1 - u) * (1 - u) * geo.deck.y + 2 * (1 - u) * u * geo.ctrlY + u * u * geo.pile.y;
+      input.push(i / N); xs.push(x); ys.push(y);
+    }
+    return { input, xs, ys };
+  }, [geo, flight.chosen]);
 
   useEffect(() => {
-    const seq = Animated.sequence([
-      // ETAPA 1 — movimiento rápido y constante
-      Animated.timing(scroll, { toValue: 0.62, duration: 1500, easing: Easing.linear, useNativeDriver: true }),
-      // ETAPA 2 — desaceleración natural hasta detenerse
-      Animated.timing(scroll, { toValue: 1, duration: 1000, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      // SELECCIÓN — la carta se endereza y queda un instante quieta
-      Animated.timing(settle, { toValue: 1, duration: 500, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-      // ELEVACIÓN — se extrae de la baraja
-      Animated.timing(lift, { toValue: 1, duration: 300, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
-      // GIRO 3D
-      Animated.timing(flip, { toValue: 1, duration: 500, easing: Easing.inOut(Easing.cubic), useNativeDriver: true }),
-    ]);
-
-    seq.start(({ finished }) => {
-      if (finished && !done.current) {
-        done.current = true;
-        onRevealed();
-      }
+    if (!flight.chosen) {
+      Animated.timing(p, { toValue: 1, duration: FLIGHT, easing: Easing.linear, useNativeDriver: true }).start(({ finished }) => {
+        if (finished) onLanded(flight);
+      });
+      return;
+    }
+    Animated.sequence([
+      Animated.timing(p, { toValue: 1, duration: 750, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      // balanceo amortiguado, como carta que queda flotando
+      Animated.sequence([
+        Animated.timing(wob, { toValue: 1, duration: 110, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+        Animated.timing(wob, { toValue: -0.6, duration: 160, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+        Animated.timing(wob, { toValue: 0.25, duration: 170, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+        Animated.timing(wob, { toValue: 0, duration: 220, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+      ]),
+      Animated.timing(flip, { toValue: 1, duration: 700, easing: Easing.inOut(Easing.cubic), useNativeDriver: true }),
+    ]).start(({ finished }) => {
+      if (finished) onRevealed();
     });
-    return () => seq.stop();
+    const landTimer = setTimeout(() => haptic('land'), 750);
+    return () => clearTimeout(landTimer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const deckX = scroll.interpolate({ inputRange: [0, 1], outputRange: [startX, endX] });
-  // Al detenerse, el resto del mazo se desvanece: queda solo la elegida.
-  const deckFade = settle.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
-
-  const settleRotate = settle.interpolate({ inputRange: [0, 1], outputRange: [TILT, '0deg'] });
-  const liftY = lift.interpolate({ inputRange: [0, 1], outputRange: [0, -26] });
-  const liftScale = lift.interpolate({ inputRange: [0, 1], outputRange: [1, 1.06] });
-  const frontRotate = flip.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
-  const backRotate = flip.interpolate({ inputRange: [0, 1], outputRange: ['180deg', '360deg'] });
-
-  const anchor = { width: cardW, height: cardH, marginLeft: -cardW / 2, marginTop: -cardH / 2 };
-
-  return (
-    <View style={styles.stage} pointerEvents="none">
-      <Animated.View style={[styles.deck, { transform: [{ translateX: deckX }] }]}>
-        {/* Cartas que desfilan */}
-        {Array.from({ length: PASSING }).map((_, i) => (
-          <Animated.View
-            key={i}
-            style={[
-              styles.anchored,
-              anchor,
-              { opacity: deckFade, transform: [{ perspective: 1000 }, { translateX: i * spacing }, { rotateY: TILT }] },
-            ]}
-          >
-            <EditionFace name={editionName} tagline={tagline} theme={theme} w={cardW} h={cardH} />
-          </Animated.View>
-        ))}
-
-        {/* La elegida: se endereza, se eleva y gira sobre su eje vertical */}
-        <Animated.View
-          style={[
-            styles.anchored,
-            anchor,
-            {
-              transform: [
-                { perspective: 1000 },
-                { translateX: PASSING * spacing },
-                { translateY: liftY },
-                { scale: liftScale },
-                { rotateY: settleRotate },
-              ],
-            },
-          ]}
-        >
-          <Animated.View style={[styles.face, { transform: [{ perspective: 1000 }, { rotateY: frontRotate }] }]}>
-            <EditionFace name={editionName} tagline={tagline} theme={theme} w={cardW} h={cardH} />
-          </Animated.View>
-          <Animated.View style={[styles.face, { transform: [{ perspective: 1000 }, { rotateY: backRotate }] }]}>
-            <PlayingCard editionName={editionName} question={question} theme={theme} compact />
-          </Animated.View>
-        </Animated.View>
-      </Animated.View>
-    </View>
+  const lift = flight.chosen ? [0, 1] : [0, 0.5, 1];
+  const translateX = p.interpolate({ inputRange: path.input, outputRange: path.xs });
+  const translateY = Animated.add(
+    p.interpolate({ inputRange: path.input, outputRange: path.ys }),
+    flip.interpolate({ inputRange: [0, 1], outputRange: [0, 18] }),
   );
-}
+  const scale = Animated.multiply(
+    p.interpolate({ inputRange: lift, outputRange: flight.chosen ? [1, 1.28] : [1, 1.28, 1] }),
+    flip.interpolate({ inputRange: [0, 1], outputRange: [1, 1.3] }),
+  );
+  const rotateX = p.interpolate({ inputRange: lift, outputRange: flight.chosen ? ['38deg', '0deg'] : ['38deg', '0deg', '38deg'] });
+  const rotateZ = Animated.add(
+    p.interpolate({ inputRange: [0, 1], outputRange: [-6, flight.chosen ? 0 : flight.tilt1] }),
+    Animated.multiply(wob, 4),
+  ).interpolate({ inputRange: [-30, 30], outputRange: ['-30deg', '30deg'] });
+  // una vuelta completa en el aire (360°) + 180° del revelado
+  const rotateY = Animated.add(Animated.multiply(p, 360), Animated.multiply(flip, 180)).interpolate({
+    inputRange: [0, 540],
+    outputRange: ['0deg', '540deg'],
+  });
 
-/**
- * Frente identificativo de la edición: color, nombre en script y su copy.
- * Cuando Erika entregue los elementos gráficos por edición se enchufan aquí,
- * sin tocar la animación.
- */
-function EditionFace({
-  name,
-  tagline,
-  theme,
-  w,
-  h,
-}: {
-  name: string;
-  tagline: string;
-  theme: EditionTheme;
-  w: number;
-  h: number;
-}) {
+  // sombra en la mesa: se aleja y se aclara cuando la carta sube
+  const shX = Animated.add(translateX, p.interpolate({ inputRange: lift, outputRange: flight.chosen ? [10, 32] : [10, 32, 10] }));
+  const shY = Animated.add(
+    p.interpolate({ inputRange: path.input, outputRange: path.ys.map((y) => y + ch * 0.42) }),
+    p.interpolate({ inputRange: lift, outputRange: flight.chosen ? [0, 26] : [0, 26, 0] }),
+  );
+  const shOpacity = p.interpolate({ inputRange: lift, outputRange: flight.chosen ? [0.8, 0.28] : [0.8, 0.28, 0.8] });
+  const shScale = p.interpolate({ inputRange: lift, outputRange: flight.chosen ? [1, 1.5] : [1, 1.5, 1] });
+  // brillo que recorre el papel al girar
+  const gloss = p.interpolate({ inputRange: [0, 0.25, 0.5, 0.75, 1], outputRange: [-cw, cw, -cw, cw, -cw] });
+
+  const anchor = { width: cw, height: ch, marginLeft: -cw / 2, marginTop: -ch / 2 };
+
   return (
-    <View style={{ width: w, height: h }}>
-      {/* Canto: da la sensación de grosor físico al verse de perfil */}
-      <View style={[styles.edge, { backgroundColor: shade(theme.card, 0.72) }]} />
-      <View style={[styles.front, { backgroundColor: theme.card }]}>
-        <View style={[styles.frontFrame, { borderColor: rgba(theme.onCard, 0.4) }]}>
-          <Text style={[styles.frontName, { color: theme.onCard }]} numberOfLines={2} adjustsFontSizeToFit>
-            {name}
-          </Text>
-          <Text style={[styles.frontTag, { color: rgba(theme.onCard, 0.85) }]} numberOfLines={3}>
-            {tagline}
-          </Text>
+    <>
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.anchored,
+          styles.floorShadow,
+          { width: cw * 1.1, height: ch * 0.5, marginLeft: -cw * 0.55, marginTop: -ch * 0.25, borderRadius: cw },
+          { opacity: shOpacity, transform: [{ translateX: shX }, { translateY: shY }, { rotateX: '70deg' }, { scale: shScale }] },
+        ]}
+      />
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.anchored,
+          anchor,
+          { transform: [{ perspective: 900 }, { translateX }, { translateY }, { rotateX }, { rotateZ }, { rotateY }, { scale }] },
+        ]}
+      >
+        {/* reverso (visible con rotateY 0) */}
+        <View style={styles.face}>
+          <PrintedCard editionId={editionId} width={cw} side="back" />
+          <Animated.View style={[styles.gloss, { width: cw * 0.5, height: ch * 1.6, transform: [{ translateX: gloss }, { rotateZ: '18deg' }] }]} />
         </View>
-      </View>
-    </View>
+        {/* frente (visible con rotateY 180) */}
+        <View style={[styles.face, { transform: [{ rotateY: '180deg' }] }]}>
+          <PrintedCard editionId={editionId} width={cw} side="front" question={flight.chosen ? question : undefined} />
+          <Animated.View style={[styles.gloss, { width: cw * 0.5, height: ch * 1.6, transform: [{ translateX: Animated.multiply(gloss, -1) }, { rotateZ: '18deg' }] }]} />
+        </View>
+      </Animated.View>
+    </>
   );
-}
-
-function rgba(hex: string, a: number): string {
-  const h = hex.replace('#', '');
-  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.substring(i, i + 2), 16));
-  return `rgba(${r},${g},${b},${a})`;
-}
-
-/** Oscurece un hex para simular el canto de la carta. */
-function shade(hex: string, k: number): string {
-  const h = hex.replace('#', '');
-  const c = [0, 2, 4].map((i) => Math.round(parseInt(h.substring(i, i + 2), 16) * k));
-  return `rgb(${c[0]},${c[1]},${c[2]})`;
 }
 
 const styles = StyleSheet.create({
   stage: { flex: 1, width: '100%', overflow: 'hidden' },
-  deck: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
   anchored: { position: 'absolute', top: '50%', left: '50%' },
-  face: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backfaceVisibility: 'hidden' },
-  edge: { position: 'absolute', left: -7, top: 6, bottom: 6, width: 7, borderTopLeftRadius: 4, borderBottomLeftRadius: 4 },
-  front: {
-    flex: 1,
-    borderRadius: 26,
-    padding: 14,
+  face: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backfaceVisibility: 'hidden', overflow: 'hidden' },
+  gloss: { position: 'absolute', top: '-30%', left: 0, backgroundColor: 'rgba(255,255,255,0.16)' },
+  floorShadow: { backgroundColor: '#2C1719' },
+  stackShadow: {
+    position: 'absolute',
+    top: 6,
+    left: 4,
+    backgroundColor: 'rgba(44,23,25,0.38)',
     shadowColor: '#2C1719',
-    shadowOpacity: 0.22,
-    shadowRadius: 20,
-    shadowOffset: { width: -6, height: 12 },
-    elevation: 10,
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 6, height: 8 },
   },
-  frontFrame: {
-    flex: 1,
-    borderWidth: 1.5,
-    borderRadius: 18,
-    paddingVertical: 24,
-    paddingHorizontal: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+  sheetEdge: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: -1.2,
+    backgroundColor: '#E9DFCF',
   },
-  frontName: { fontFamily: fonts.script, fontSize: 26, textAlign: 'center', lineHeight: scriptLineHeight(26), paddingHorizontal: scriptSidePadding(26) },
-  frontTag: { fontFamily: fonts.body, fontWeight: '600', fontSize: 12.5, textAlign: 'center', lineHeight: 18 },
+  hint: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 14,
+    textAlign: 'center',
+    fontFamily: fonts.body,
+    fontWeight: '700',
+    fontSize: 13,
+    letterSpacing: 0.4,
+  },
 });

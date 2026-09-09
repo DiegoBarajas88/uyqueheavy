@@ -6,7 +6,6 @@ import { getEdition, Question } from '../../src/data/editions';
 import { editionThemes, brand, fonts, scriptLineHeight, scriptSidePadding } from '../../src/theme/theme';
 import { drawNextQuestion } from '../../src/lib/storage';
 import CardDeckDraw from '../../src/components/CardDeckDraw';
-import PlayingCard from '../../src/components/PlayingCard';
 import BrandButton from '../../src/components/BrandButton';
 import BrandText from '../../src/components/BrandText';
 
@@ -83,25 +82,19 @@ export default function Play() {
       </View>
 
       <View style={[styles.body, { paddingBottom: insets.bottom + 24 }]}>
-        {/* Paso 3 y 4: la animación recibe la pregunta ya elegida. */}
-        {phase === 'animating' && question && (
-          <CardDeckDraw
-            key={round}
-            editionName={edition.name}
-            tagline={edition.tagline}
-            question={question.text}
-            theme={t}
-            onRevealed={() => setPhase('question')}
-          />
-        )}
-
-        {/* Paso 5: la misma pregunta, ya revelada, con los controles. */}
-        {phase === 'question' && question && (
+        {/* Paso 3, 4 y 5: la baraja recibe la pregunta ya elegida, la revela y se queda
+            mostrándola (no se desmonta: así la carta no salta de sitio al aparecer el botón). */}
+        {(phase === 'animating' || phase === 'question') && question && (
           <>
-            <View style={styles.cardWrap}>
-              <PlayingCard editionName={edition.name} question={question.text} theme={t} />
-            </View>
-            <View style={styles.actions}>
+            <CardDeckDraw
+              key={round}
+              editionId={edition.id}
+              question={question.text}
+              theme={t}
+              onRevealed={() => setPhase('question')}
+            />
+            {/* El bloque de acciones ocupa su sitio desde el inicio para que la mesa no cambie de tamaño. */}
+            <View style={[styles.actions, phase !== 'question' && styles.actionsHidden]} pointerEvents={phase === 'question' ? 'auto' : 'none'}>
               <BrandButton label="Otra pregunta" bg={t.card} color={t.onCard} onPress={otraPregunta} />
               {/* Compartir en Instagram → Fase 2 del roadmap (§20). Sin aviso "próximamente": Apple lo rechaza (Guideline 2.1). */}
             </View>
@@ -129,8 +122,8 @@ const styles = StyleSheet.create({
   back: { color: '#F0DCC9', fontFamily: fonts.body, fontWeight: '700', fontSize: 16 },
   body: { flex: 1, paddingHorizontal: 26, width: '100%', maxWidth: 480, alignSelf: 'center', justifyContent: 'center' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  cardWrap: { flex: 1, justifyContent: 'center', paddingVertical: 16 },
-  actions: { gap: 12, paddingBottom: 6 },
+  actions: { gap: 12, paddingBottom: 6, paddingTop: 10 },
+  actionsHidden: { opacity: 0 },
   shareHint: { fontFamily: fonts.body, fontWeight: '700', fontSize: 13, textAlign: 'center', letterSpacing: 0.4, opacity: 0.8 },
   wow: { fontFamily: fonts.script, fontSize: 40, textAlign: 'center', lineHeight: scriptLineHeight(40), paddingHorizontal: scriptSidePadding(40) },
   wowSub: { fontFamily: fonts.body, fontWeight: '600', fontSize: 16, lineHeight: 24, textAlign: 'center', marginTop: 14, maxWidth: 340 },
