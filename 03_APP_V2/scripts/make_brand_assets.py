@@ -134,8 +134,14 @@ def play_store_graphics():
     d.ellipse((700, -260, 1200, 240), fill=WINE_SOFT)
     d.ellipse((-160, 330, 260, 750), fill=WINE_SOFT)
     draw_wordline(fg, (160, 110, 864, 290))
-    sub = ImageFont.truetype(os.path.join(ROOT, 'assets/fonts/Sieroty.ttf'), 58)
     text = 'Conectando un mundo desconectado'
+    size = 60
+    while True:  # Sieroty se desborda por los lados: ajustar a 820px reales
+        sub = ImageFont.truetype(os.path.join(ROOT, 'assets/fonts/Sieroty.ttf'), size)
+        l, t, r, b = d.textbbox((0, 0), text, font=sub)
+        if r - l <= 820 or size <= 20:
+            break
+        size -= 2
     l, t, r, b = d.textbbox((0, 0), text, font=sub)
     d.text(((1024 - (r - l)) // 2 - l, 330 - t), text, font=sub, fill=(0xE8, 0xC9, 0xC9))
     fg.save(os.path.join(out, 'feature-1024x500.png'), optimize=True)
