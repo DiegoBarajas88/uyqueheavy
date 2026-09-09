@@ -49,7 +49,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 |    | · Seguridad de datos: "No recopila ni comparte datos del usuario" (la app no tiene cuentas ni analítica) | | |
 | B7 | Ficha de Play Store (Store listing). Pegar desde `store/APP_STORE_FICHA.md`: nombre, descripción corta (80), descripción completa. Categoría: Entretenimiento. Correo: contacto@diegobarajas.com | 👤 | ⬜ |
 | B8 | Recursos gráficos: **listos** en `2. Desarrollos Propios/UY QUE HEAVY/assets_play/` (ícono 512, gráfico 1024×500 y las 5 capturas) | 🤖 ✅ prepara · 👤 ⬜ sube | 🔄 |
-| B9 | Generar el AAB de producción: `eas build -p android --profile production` | 👤 | ✅ versionCode 2, 2026-09-09: https://expo.dev/artifacts/eas/32F_D8_f_QVo31z91SfYsa0y4L-9hYZlTqLR9YleAvs.aab |
+| B9 | Generar el AAB de producción: `eas build -p android --profile production` | 👤 | ✅ versionCode 2 (sin baraja física) · ⬜ regenerar con la baraja física antes de subir a Play |
 | B10 | Primera subida SIEMPRE manual: Play Console → Pruebas → Prueba interna → Crear versión → subir el `.aab` descargado de EAS. Google lo exige para activar la firma de Play | 👤 | ⬜ |
 | B11 | ~~Prueba cerrada de 12 testers × 14 días~~ — **NO APLICA** por ser cuenta de organización | — | ✅ evitado |
 | B12 | Pasar directo a Producción | 👤 | ⬜ |
@@ -64,11 +64,11 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 |---|------|-------|--------|
 | C1 | Entrar a https://appstoreconnect.apple.com (Apple ID appsdb123@gmail.com, equipo Viko Holdings LLC) | 👤 | ✅ |
 | C2 | App creada en App Store Connect: `Uy Qué Heavy`, vendedor Viko Holdings, SKU uqh-app-v2, ASC App ID 6810321248 | 👤 | ✅ |
-| C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | ✅ build 4 (2026-09-09) con ícono UQH. El build 3 tiene ícono de plantilla, no usarlo |
-| C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS) | 👤 | ✅ build 3 subido · ⬜ **falta subir build 4** |
+| C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | ✅ build 4 (ícono UQH) · 🔄 **build 5** con la baraja física (cartas reales, toque para detener, vibración) en curso 2026-09-09 |
+| C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS) | 🤖 | ✅ build 3 y 4 subidos · 🔄 build 5 se sube solo al terminar |
 | C5 | Ficha en App Store Connect, campo por campo → ver "Guía C5" abajo | 👤 | ⬜ |
 | C6 | Privacidad de la app: "No se recopilan datos" → incluido en Guía C5, pantalla 4 | 👤 | ⬜ |
-| C7 | TestFlight: probar en tu iPhone antes de enviar a revisión. Invitación recibida 2026-09-09 13:52 (build 3, ícono de plantilla; el build 4 llegará solo a TestFlight) | 👤 | 🔄 |
+| C7 | TestFlight: probar en tu iPhone antes de enviar a revisión. Probar el **build 5** (baraja física) en TestFlight y la web en uyqueheavy.vercel.app | 👤 | 🔄 |
 | C8 | Enviar a revisión. Apple tarda de 1 a 3 días | 👤 | ⬜ |
 
 ---
