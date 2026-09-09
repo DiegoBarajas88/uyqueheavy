@@ -64,7 +64,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 |---|------|-------|--------|
 | C1 | Entrar a https://appstoreconnect.apple.com con el Apple ID del Developer Program | 👤 | ⬜ |
 | C2 | Apps → **+** → Nueva app. Plataforma iOS · Nombre `Uy Qué Heavy` · Idioma principal Español (México) · Bundle ID `com.uyqueheavy.app` (si no aparece, EAS lo registra en el paso C3) · SKU `uqh-app-v2` | 👤 | ⬜ |
-| C3 | Build iOS de producción: `eas build -p ios --profile production`. EAS pide entrar con el Apple ID y crea certificados solo | 🤖 dirige · 👤 ejecuta | ⬜ |
+| C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | ✅ hecho 2026-09-08, 2 builds FINISHED en EAS, certificados creados |
 | C4 | Subir el build: `eas submit -p ios --latest` (pide Apple ID y contraseña específica de app de https://appleid.apple.com) | 🤖 dirige · 👤 ejecuta | ⬜ |
 | C5 | En App Store Connect: pegar ficha desde `store/APP_STORE_FICHA.md`, subir capturas 6.7", clasificación 17+, URLs de privacidad y soporte, info de contacto para revisión (aquí va el teléfono de A5) | 👤 | ⬜ |
 | C6 | Privacidad de la app: "No se recopilan datos" | 👤 | ⬜ |
@@ -77,7 +77,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 
 | # | Paso | Quién | Estado |
 |---|------|-------|--------|
-| D1 | `eas build -p android --profile preview` → APK instalable directo en cualquier Android | 👤 ejecuta | ⬜ |
+| D1 | `eas build -p android --profile preview` → APK instalable directo en cualquier Android | 👤 | ✅ APK del 2026-09-08 (sin el último cambio) · 🔄 nuevo APK en cola 2026-09-09 con el código actual |
 | D2 | `eas build -p ios --profile preview` → requiere registrar el UDID de tu iPhone (EAS te guía con un link) | 👤 ejecuta | ⬜ |
 | D3 | Instalar en 2-3 celulares y jugar una ronda completa de cada edición | 👤 + Erika | ⬜ |
 
