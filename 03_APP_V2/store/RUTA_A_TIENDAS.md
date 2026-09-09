@@ -3,7 +3,7 @@
 Este archivo es la ÚNICA lista de pasos para publicar. Claude la lleva y la actualiza.
 Leyenda: ✅ hecho · 🔄 en curso · ⬜ pendiente · 👤 lo hace Felipe · 🤖 lo hace Claude
 
-Última actualización: 2026-09-09 (teléfono puesto)
+Última actualización: 2026-09-09 (cuenta de organización Viko Holdings · D-U-N-S obtenido)
 
 ---
 
@@ -13,7 +13,8 @@ Leyenda: ✅ hecho · 🔄 en curso · ⬜ pendiente · 👤 lo hace Felipe · �
 |---|------|-------|--------|
 | A1 | Cuenta Expo + `eas login` (usuario filippobarajas) | 👤 | ✅ |
 | A2 | Apple Developer Program activo | 👤 | ✅ (según Felipe) |
-| A3 | Google Play Console: crear cuenta y pagar USD 25 | 👤 | ⬜ → ver Bloque B |
+| A3 | Google Play Console: crear cuenta y pagar USD 25 | 👤 | 🔄 en curso — cuenta de ORGANIZACIÓN a nombre de VIKO HOLDINGS, LLC |
+| A6 | D-U-N-S de Viko Holdings: **134806247** — confirmado por Google | 👤 | ✅ |
 | A4 | Web desplegada en https://uyqueheavy.vercel.app (privacidad y soporte) | 🤖 | ✅ |
 | A5 | Teléfono real de contacto en `store.config.json` (+57 318 973 1434) | 🤖 | ✅ |
 
@@ -21,23 +22,22 @@ Leyenda: ✅ hecho · 🔄 en curso · ⬜ pendiente · 👤 lo hace Felipe · �
 
 ## Bloque B — Google Play Console, paso a paso
 
-**Antes de empezar, decide el tipo de cuenta.** Es la decisión más importante:
+**Decisión tomada (09-sep-2026): cuenta de ORGANIZACIÓN a nombre de VIKO HOLDINGS, LLC.**
 
-- **Personal**: rápida de crear, pero Google obliga a las cuentas personales nuevas a hacer una
-  *prueba cerrada con mínimo 12 testers durante 14 días seguidos* antes de dejarte publicar en producción.
-  Eso suma unas 2-3 semanas al calendario.
-- **Organización**: necesita un número D-U-N-S de la empresa (gratis, tarda hasta 30 días en emitirse
-  si no lo tienes) y verificación de la empresa. NO tiene el requisito de los 12 testers.
+Motivo: las cuentas personales creadas después del 13-nov-2023 deben pasar una prueba cerrada con
+12 testers durante 14 días seguidos antes de publicar en producción. Las cuentas de organización con
+D-U-N-S están exentas. Viko ya tenía D-U-N-S (**134806247**), así que no hubo que esperar los 30 días
+de emisión y nos ahorramos ~3 semanas de calendario.
 
-Recomendación: si ya tienes empresa registrada con D-U-N-S, organización. Si no, personal y arrancamos la
-prueba cerrada de inmediato con amigos y familia (Erika, tú y 10 más).
+Datos de la empresa, documentos de respaldo y la guía detallada de cada pantalla están en:
+`2. VIKO HOLDINGS LLC/2. Desarrollos Propios/UY QUE HEAVY/`
 
 | # | Paso | Quién | Estado |
 |---|------|-------|--------|
-| B1 | Entrar a https://play.google.com/console/signup con la cuenta Google que será dueña de la app (mejor una del proyecto, no personal si es posible) | 👤 | ⬜ |
-| B2 | Elegir tipo de cuenta (personal u organización) y llenar nombre de desarrollador: "Uy Qué Heavy" | 👤 | ⬜ |
-| B3 | Pagar USD 25 (una sola vez) con tarjeta | 👤 | ⬜ |
-| B4 | Verificación de identidad: subir documento de identidad, confirmar teléfono y correo. Google tarda de horas a varios días | 👤 | ⬜ |
+| B1 | Entrar a https://play.google.com/console/signup con la cuenta Google que será dueña de la app | 👤 | ✅ |
+| B2 | Tipo de cuenta: **Organización** · nombre de desarrollador público: `Uy Qué Heavy` · perfil de pagos con D-U-N-S `134806247` | 👤 | ✅ |
+| B3 | Pagar USD 25 (una sola vez) con tarjeta | 👤 | ✅ |
+| B4 | Verificación de **empresa**: documentos que coincidan con D&B → `Articles of Organization` + carta IRS `147C` (ambos en `3. Legal/`). Más OTP a correo y celular | 👤 | ⬜ |
 | B5 | Cuando la cuenta esté verificada: botón **Crear app**. Nombre: `Uy Qué Heavy` · Idioma predeterminado: `Español (Latinoamérica)` · Tipo: `App` · Gratis · aceptar declaraciones | 👤 | ⬜ |
 | B6 | En el panel "Configura tu app" completar cada declaración con estas respuestas: | 👤 | ⬜ |
 |    | · Política de privacidad: `https://uyqueheavy.vercel.app/privacidad.html` | | |
@@ -48,11 +48,11 @@ prueba cerrada de inmediato con amigos y familia (Erika, tú y 10 más).
 |    | · App de noticias: No · App de salud: No · App financiera: No · App gubernamental: No | | |
 |    | · Seguridad de datos: "No recopila ni comparte datos del usuario" (la app no tiene cuentas ni analítica) | | |
 | B7 | Ficha de Play Store (Store listing). Pegar desde `store/APP_STORE_FICHA.md`: nombre, descripción corta (80), descripción completa. Categoría: Entretenimiento. Correo: contacto@diegobarajas.com | 👤 | ⬜ |
-| B8 | Recursos gráficos de la ficha: ícono 512×512 PNG · gráfico de funciones 1024×500 · mínimo 2 capturas de teléfono (usar las 5 de `store/screenshots/ios-6.7/`) | 🤖 prepara archivos · 👤 sube | ⬜ |
+| B8 | Recursos gráficos: **listos** en `2. Desarrollos Propios/UY QUE HEAVY/assets_play/` (ícono 512, gráfico 1024×500 y las 5 capturas) | 🤖 ✅ prepara · 👤 ⬜ sube | 🔄 |
 | B9 | Generar el AAB de producción: `eas build -p android --profile production`. EAS crea y guarda la llave de firma | 🤖 dirige · 👤 ejecuta | ⬜ |
 | B10 | Primera subida SIEMPRE manual: Play Console → Pruebas → Prueba interna → Crear versión → subir el `.aab` descargado de EAS. Google lo exige para activar la firma de Play | 👤 | ⬜ |
-| B11 | Si la cuenta es personal: crear Prueba cerrada, agregar lista de 12+ correos de testers, publicar y esperar 14 días con los 12 instalados | 👤 | ⬜ |
-| B12 | Solicitar acceso a producción (cuenta personal) o pasar directo a Producción (organización) | 👤 | ⬜ |
+| B11 | ~~Prueba cerrada de 12 testers × 14 días~~ — **NO APLICA** por ser cuenta de organización | — | ✅ evitado |
+| B12 | Pasar directo a Producción | 👤 | ⬜ |
 | B13 | Revisión de Google: normalmente de 1 a 7 días | — | ⬜ |
 | B14 | (Opcional, para después) Cuenta de servicio de Google Cloud para que `eas submit -p android` suba solo | 🤖 | ⬜ |
 
@@ -88,6 +88,6 @@ prueba cerrada de inmediato con amigos y familia (Erika, tú y 10 más).
 - Hojas definitivas del Excel, columna F de Friends, filtro J/F de Family
 - Copies / jaculatorias definitivas
 - Colores Family y Storytime
-- Ícono definitivo 1024×1024
+- Ícono definitivo 1024×1024 — ⚠️ **el `assets/icon.png` actual sigue siendo el placeholder de Expo (la 'A' azul)**. Hay un provisional de marca en `assets_play/icono_1024_para_la_app.png` listo para reemplazarlo.
 
 Cuando lleguen, se actualizan datos y se publica una versión 2.0.1.
