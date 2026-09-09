@@ -63,6 +63,9 @@ export default function CardDeckDraw({ editionId, question, theme, onRevealed }:
       pile: { x: stage.w * 0.27, y: stage.h * 0.19 },
       apex: { x: 0, y: -stage.h * 0.1 },
       ctrlY: -stage.h * 0.1 - stage.h * 0.22,
+      // al revelar, la carta baja al centro de la mesa y crece hasta casi todo el ancho
+      revealShift: stage.h * 0.1,
+      revealScale: Math.min(stage.w * 0.92, (stage.h - 8) * CARD_RATIO) / (cw * 1.28),
     };
   }, [stage]);
 
@@ -217,7 +220,7 @@ function FlyingCard({
   flight: Flight;
   editionId: string;
   question: string;
-  geo: { cw: number; ch: number; deck: { x: number; y: number }; pile: { x: number; y: number }; apex: { x: number; y: number }; ctrlY: number };
+  geo: { cw: number; ch: number; deck: { x: number; y: number }; pile: { x: number; y: number }; apex: { x: number; y: number }; ctrlY: number; revealShift: number; revealScale: number };
   onLanded: (f: Flight) => void;
   onRevealed: () => void;
   haptic: (k: 'tick' | 'land') => void;
@@ -269,11 +272,11 @@ function FlyingCard({
   const translateX = p.interpolate({ inputRange: path.input, outputRange: path.xs });
   const translateY = Animated.add(
     p.interpolate({ inputRange: path.input, outputRange: path.ys }),
-    flip.interpolate({ inputRange: [0, 1], outputRange: [0, 18] }),
+    flip.interpolate({ inputRange: [0, 1], outputRange: [0, geo.revealShift] }),
   );
   const scale = Animated.multiply(
     p.interpolate({ inputRange: lift, outputRange: flight.chosen ? [1, 1.28] : [1, 1.28, 1] }),
-    flip.interpolate({ inputRange: [0, 1], outputRange: [1, 1.3] }),
+    flip.interpolate({ inputRange: [0, 1], outputRange: [1, geo.revealScale] }),
   );
   const rotateX = p.interpolate({ inputRange: lift, outputRange: flight.chosen ? ['38deg', '0deg'] : ['38deg', '0deg', '38deg'] });
   const rotateZ = Animated.add(
@@ -295,7 +298,11 @@ function FlyingCard({
     p.interpolate({ inputRange: path.input, outputRange: path.ys.map((y) => y + ch * 0.42) }),
     p.interpolate({ inputRange: lift, outputRange: flight.chosen ? [0, 26] : [0, 26, 0] }),
   );
-  const shOpacity = p.interpolate({ inputRange: lift, outputRange: flight.chosen ? [0.8, 0.28] : [0.8, 0.28, 0.8] });
+  const shOpacity = Animated.multiply(
+    p.interpolate({ inputRange: lift, outputRange: flight.chosen ? [0.8, 0.28] : [0.8, 0.28, 0.8] }),
+    flip.interpolate({ inputRange: [0, 0.5, 1], outputRange: [1, 0, 0] }),
+  );
+  const glossOpacity = flip.interpolate({ inputRange: [0, 0.4], outputRange: [1, 0], extrapolate: 'clamp' });
   const shScale = p.interpolate({ inputRange: lift, outputRange: flight.chosen ? [1, 1.5] : [1, 1.5, 1] });
   // brillo que recorre el papel al girar
   const gloss = p.interpolate({ inputRange: [0, 0.25, 0.5, 0.75, 1], outputRange: [-cw, cw, -cw, cw, -cw] });
@@ -310,7 +317,7 @@ function FlyingCard({
           styles.anchored,
           styles.floorShadow,
           { width: cw * 1.1, height: ch * 0.5, marginLeft: -cw * 0.55, marginTop: -ch * 0.25, borderRadius: cw },
-          { opacity: shOpacity, transform: [{ translateX: shX }, { translateY: shY }, { rotateX: '70deg' }, { scale: shScale }] },
+          { opacity: shOpacity, zIndex: 1, transform: [{ translateX: shX }, { translateY: shY }, { rotateX: '70deg' }, { scale: shScale }] },
         ]}
       />
       <Animated.View
@@ -318,18 +325,19 @@ function FlyingCard({
         style={[
           styles.anchored,
           anchor,
-          { transform: [{ perspective: 900 }, { translateX }, { translateY }, { rotateX }, { rotateZ }, { rotateY }, { scale }] },
+          flight.chosen && styles.chosenShadow,
+          { zIndex: 2, transform: [{ perspective: 900 }, { translateX }, { translateY }, { rotateX }, { rotateZ }, { rotateY }, { scale }] },
         ]}
       >
         {/* reverso (visible entre -90° y 90°) */}
         <Animated.View style={[styles.face, { opacity: backOpacity }]}>
           <PrintedCard editionId={editionId} width={cw} side="back" />
-          <Animated.View style={[styles.gloss, { width: cw * 0.5, height: ch * 1.6, transform: [{ translateX: gloss }, { rotateZ: '18deg' }] }]} />
+          <Animated.View style={[styles.gloss, { width: cw * 0.5, height: ch * 1.6, opacity: glossOpacity, transform: [{ translateX: gloss }, { rotateZ: '18deg' }] }]} />
         </Animated.View>
         {/* frente (visible entre 90° y 270°), pre-espejado */}
         <Animated.View style={[styles.face, { opacity: frontOpacity, transform: [{ scaleX: -1 }] }]}>
           <PrintedCard editionId={editionId} width={cw} side="front" question={flight.chosen ? question : undefined} />
-          <Animated.View style={[styles.gloss, { width: cw * 0.5, height: ch * 1.6, transform: [{ translateX: Animated.multiply(gloss, -1) }, { rotateZ: '18deg' }] }]} />
+          <Animated.View style={[styles.gloss, { width: cw * 0.5, height: ch * 1.6, opacity: glossOpacity, transform: [{ translateX: Animated.multiply(gloss, -1) }, { rotateZ: '18deg' }] }]} />
         </Animated.View>
       </Animated.View>
     </>
@@ -342,6 +350,14 @@ const styles = StyleSheet.create({
   face: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden' },
   gloss: { position: 'absolute', top: '-30%', left: 0, backgroundColor: 'rgba(255,255,255,0.16)' },
   floorShadow: { backgroundColor: '#2C1719' },
+  // sombra suave propia de la carta elegida (queda al revelar; la elíptica de vuelo se apaga)
+  chosenShadow: {
+    shadowColor: '#2C1719',
+    shadowOpacity: 0.32,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 12,
+  },
   stackShadow: {
     position: 'absolute',
     top: 6,

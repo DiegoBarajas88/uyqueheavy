@@ -10,7 +10,8 @@ import { fonts } from '../theme/theme';
  *
  * Geometría medida sobre la plantilla de 961×1402 px (65.5×95.5 mm):
  *   - marco: 15.4 % de ancho por lado
- *   - bloque de pregunta: centrado al 52 % de alto, Quicksand 40/961 de ancho, interlínea 51/961
+ *   - bloque de pregunta: centrado al 52 % de alto. En la impresa la letra es 40/961 del ancho;
+ *     en pantalla se usa 0.05 del ancho (más grande, por legibilidad en el celular)
  */
 export const CARD_RATIO = 960 / 1401;
 
@@ -49,9 +50,9 @@ export default function PrintedCard({ editionId, width, side = 'front', question
     <View style={[styles.card, { width, height: h, borderRadius: r }]}>
       <Image source={cardImage(editionId, side)} style={{ width, height: h }} resizeMode="cover" fadeDuration={0} />
       {side === 'front' && question ? (
-        <View style={[styles.textBand, { left: width * 0.17, right: width * 0.17, top: h * 0.395, height: h * 0.25 }]}>
+        <View style={[styles.textBand, { left: width * 0.16, right: width * 0.16, top: h * 0.38, height: h * 0.29 }]}>
           <Text
-            style={[styles.question, { fontSize: width * 0.0417, lineHeight: width * 0.053 }]}
+            style={[styles.question, { fontSize: width * 0.05, lineHeight: width * 0.064 }]}
             numberOfLines={6}
             adjustsFontSizeToFit
             minimumFontScale={0.72}
