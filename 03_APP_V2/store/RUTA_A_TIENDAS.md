@@ -50,7 +50,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 | B7 | Ficha de Play Store (Store listing): textos de `store/APP_STORE_FICHA.md`, categoría Entretenimiento, contacto | 👤 | ✅ 2026-09-10, "Ready to send for review" |
 | B8 | Recursos gráficos: **listos** en `2. Desarrollos Propios/UY QUE HEAVY/assets_play/` (ícono 512, gráfico 1024×500 y las 5 capturas) | 🤖 ✅ prepara · 👤 ⬜ sube | 🔄 |
 | B9 | Generar el AAB de producción: `eas build -p android --profile production` | 🤖 | ✅ versionCode 3 (2026-09-10) con la baraja física. Descargado en `~/Downloads/uyqueheavy-v2.0.0-3.aab`. Link: https://expo.dev/artifacts/eas/Jo2RbnDp2nCwkmLnloltg_IUujrBzAkAeRSjHJ5P_Vo.aab |
-| B10 | Primera subida SIEMPRE manual: Play Console → Pruebas → Prueba interna → Crear versión → subir el `.aab` descargado de EAS. Google lo exige para activar la firma de Play | 👤 | ⬜ |
+| B10 | Prueba interna: AAB versión 3 subido y publicado, lista de testers "Equipo UQH" (Felipe + Erika). Play tarda 10-60 min en activar el link | 👤 | ✅ 2026-09-10 15:45 · 🔄 esperando que el link funcione en el celular |
 | B11 | ~~Prueba cerrada de 12 testers × 14 días~~ — **NO APLICA** por ser cuenta de organización | — | ✅ evitado |
 | B12 | Pasar directo a Producción | 👤 | ⬜ |
 | B13 | Revisión de Google: normalmente de 1 a 7 días | — | ⬜ |
