@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
-import { brand, fonts, EditionTheme, scriptLineHeight, scriptSidePadding } from '../theme/theme';
+import { brand, fonts, EditionTheme } from '../theme/theme';
+import ScriptText from './ScriptText';
 
 type Props = {
   visible: boolean;
@@ -17,7 +18,7 @@ export default function JaculatoriaModal({ visible, onClose, editionName, jacula
       <Pressable style={styles.backdrop} onPress={onClose}>
         <Pressable style={[styles.sheet, { backgroundColor: theme.cardSoft }]} onPress={() => {}}>
           <Text style={[styles.eyebrow, { color: theme.accent }]}>Jaculatoria</Text>
-          <Text style={[styles.name, { color: theme.accent }]}>{editionName}</Text>
+          <ScriptText size={30} color={theme.accent}>{editionName}</ScriptText>
           <Text style={[styles.body, { color: theme.questionInk }]}>{jaculatoria}</Text>
           <Pressable onPress={onClose} style={[styles.close, { borderColor: theme.accent }]}>
             <Text style={[styles.closeText, { color: theme.accent }]}>Cerrar</Text>
@@ -52,7 +53,6 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     textTransform: 'uppercase',
   },
-  name: { fontFamily: fonts.script, fontSize: 30, textAlign: 'center', lineHeight: scriptLineHeight(30), paddingHorizontal: scriptSidePadding(30) },
   body: {
     fontFamily: fonts.body,
     fontWeight: '600',

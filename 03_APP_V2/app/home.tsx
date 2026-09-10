@@ -3,8 +3,9 @@ import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { editions, Edition } from '../src/data/editions';
-import { editionThemes, brand, fonts, layout, scriptLineHeight, scriptSidePadding } from '../src/theme/theme';
+import { editionThemes, brand, fonts } from '../src/theme/theme';
 import BrandText from '../src/components/BrandText';
+import ScriptText from '../src/components/ScriptText';
 
 /**
  * Home (Brief §4): header de marca + las 5 ediciones como bandas visuales,
@@ -56,7 +57,7 @@ function EditionBand({ edition, onPress }: { edition: Edition; onPress: () => vo
         accessibilityRole="button"
         accessibilityLabel={edition.name}
       >
-        <Text style={[styles.cardName, { color: t.onCard }]}>{edition.name}</Text>
+        <ScriptText size={40} color={t.onCard}>{edition.name}</ScriptText>
         <Text style={[styles.cardTag, { color: t.onCard }]}>{edition.tagline}</Text>
       </Pressable>
     </View>
@@ -93,7 +94,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     elevation: 4,
   },
-  cardName: { fontFamily: fonts.script, fontSize: 40, textAlign: 'center', lineHeight: scriptLineHeight(40), paddingHorizontal: scriptSidePadding(40) },
   cardTag: { fontFamily: fonts.body, fontWeight: '600', fontSize: 13.5, textAlign: 'center', opacity: 0.9 },
   instr: {
     marginTop: 22,

@@ -38,11 +38,13 @@ export const scriptLineHeight = (fontSize: number) => Math.ceil(fontSize * 2.18)
  * (medido: 5.0px a 26pt, 7.7px a 40pt, 10.0px a 52pt). Igual que con el alto,
  * iOS recorta lo que sobresale y la L aparece cortada; web no.
  *
- * Se aplica el mismo aire a los dos lados para no descentrar el texto, con un
- * 0.22 (algo por encima del 0.193 medido) para que el redondeo en dispositivo
- * no vuelva a rozar el remate.
+ * Medido después con Pillow sobre la fuente: la "E" de "Edition" arranca 0.33em a la
+ * izquierda del origen (más que la "L"). Se aplica el mismo aire a los dos lados para no
+ * descentrar el texto, con 0.36 para que el redondeo en dispositivo no roce el remate.
+ * Usar SIEMPRE <ScriptText>, que pone el aire en una View envolvente (en Android el
+ * padding del propio <Text> no entra en la medición y rompe el salto de línea).
  */
-export const scriptSidePadding = (fontSize: number) => Math.ceil(fontSize * 0.22);
+export const scriptSidePadding = (fontSize: number) => Math.ceil(fontSize * 0.36);
 
 export type EditionTheme = {
   bg: string;         // fondo de pantalla (suave)

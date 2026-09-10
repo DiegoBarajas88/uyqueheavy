@@ -168,8 +168,14 @@ export default function CardDeckDraw({ editionId, question, theme, onRevealed }:
     <Pressable style={styles.stage} onLayout={onLayout} onPress={onTap} accessibilityLabel="Mesa de juego; toca para detener la baraja">
       {stage.w > 0 && (
         <>
-          <Stack editionId={editionId} pos={geo.deck} tilt={-6} sheets={deckSheets} cw={geo.cw} ch={geo.ch} />
-          <Stack editionId={editionId} pos={geo.pile} tilt={5} sheets={pile.length} tilts={pile} cw={geo.cw} ch={geo.ch} />
+          {/* Capas contenedoras planas: iOS ordena mal las vistas hermanas con transformaciones 3D
+              (dibujaba el mazo encima de la carta revelada). Cada capa es una vista sin transformar,
+              y entre capas el orden sí se respeta: mesa < vuelo < carta revelada. */}
+          <View style={styles.layer} pointerEvents="none">
+            <Stack editionId={editionId} pos={geo.deck} tilt={-6} sheets={deckSheets} cw={geo.cw} ch={geo.ch} />
+            <Stack editionId={editionId} pos={geo.pile} tilt={5} sheets={pile.length} tilts={pile} cw={geo.cw} ch={geo.ch} />
+          </View>
+          <View style={[styles.layer, { zIndex: 10 }]} pointerEvents="none">
           {flights.map((f) => (
             <FlyingCard
               key={f.id}
@@ -182,16 +188,18 @@ export default function CardDeckDraw({ editionId, question, theme, onRevealed }:
               haptic={haptic}
             />
           ))}
+          </View>
           {revealed && (
-            <View
-              pointerEvents="none"
-              style={[
-                styles.anchored,
-                styles.chosenShadow,
-                { zIndex: 3, width: geo.revealWidth, height: geo.revealWidth / CARD_RATIO, marginLeft: -geo.revealWidth / 2, marginTop: -geo.revealWidth / CARD_RATIO / 2 },
-              ]}
-            >
-              <PrintedCard editionId={editionId} width={geo.revealWidth} side="front" question={question} />
+            <View style={[styles.layer, { zIndex: 20 }]} pointerEvents="none">
+              <View
+                style={[
+                  styles.anchored,
+                  styles.chosenShadow,
+                  { width: geo.revealWidth, height: geo.revealWidth / CARD_RATIO, marginLeft: -geo.revealWidth / 2, marginTop: -geo.revealWidth / CARD_RATIO / 2 },
+                ]}
+              >
+                <PrintedCard editionId={editionId} width={geo.revealWidth} side="front" question={question} />
+              </View>
             </View>
           )}
           {!revealed && (
@@ -363,6 +371,7 @@ function FlyingCard({
 
 const styles = StyleSheet.create({
   stage: { flex: 1, width: '100%', overflow: 'hidden' },
+  layer: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
   anchored: { position: 'absolute', top: '50%', left: '50%' },
   face: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden' },
   gloss: { position: 'absolute', top: '-30%', left: 0, backgroundColor: 'rgba(255,255,255,0.16)' },

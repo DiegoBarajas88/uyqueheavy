@@ -3,7 +3,8 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getEdition } from '../../src/data/editions';
-import { editionThemes, brand, fonts, scriptLineHeight, scriptSidePadding } from '../../src/theme/theme';
+import { editionThemes, brand, fonts } from '../../src/theme/theme';
+import ScriptText from '../../src/components/ScriptText';
 import BrandButton from '../../src/components/BrandButton';
 import JaculatoriaModal from '../../src/components/JaculatoriaModal';
 
@@ -37,7 +38,7 @@ export default function EditionScreen() {
 
       <View style={[styles.body, { paddingBottom: insets.bottom + 28 }]}>
         <View style={styles.top}>
-          <Text style={[styles.name, { color: t.accent }]}>{edition.name}</Text>
+          <ScriptText size={52} color={t.accent}>{edition.name}</ScriptText>
           <Text style={[styles.audience, { color: t.questionInk }]}>{edition.audience}</Text>
           <Text style={[styles.copy, { color: t.questionInk }]}>{edition.description}</Text>
         </View>
@@ -75,7 +76,6 @@ const styles = StyleSheet.create({
   back: { color: '#F0DCC9', fontFamily: fonts.body, fontWeight: '700', fontSize: 16 },
   body: { flex: 1, paddingHorizontal: 28, justifyContent: 'space-between', width: '100%', maxWidth: 560, alignSelf: 'center' },
   top: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 12 },
-  name: { fontFamily: fonts.script, fontSize: 52, textAlign: 'center', lineHeight: scriptLineHeight(52), paddingHorizontal: scriptSidePadding(52) },
   audience: { fontFamily: fonts.body, fontWeight: '700', fontSize: 13, letterSpacing: 2, textTransform: 'uppercase', opacity: 0.7 },
   copy: { fontFamily: fonts.body, fontWeight: '600', fontSize: 19, lineHeight: 27, textAlign: 'center', maxWidth: 380, marginTop: 6 },
   actions: { gap: 12 },

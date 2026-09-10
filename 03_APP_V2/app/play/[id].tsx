@@ -3,11 +3,11 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getEdition, Question } from '../../src/data/editions';
-import { editionThemes, brand, fonts, scriptLineHeight, scriptSidePadding } from '../../src/theme/theme';
+import { editionThemes, brand, fonts } from '../../src/theme/theme';
 import { drawNextQuestion } from '../../src/lib/storage';
 import CardDeckDraw from '../../src/components/CardDeckDraw';
 import BrandButton from '../../src/components/BrandButton';
-import BrandText from '../../src/components/BrandText';
+import ScriptText from '../../src/components/ScriptText';
 
 type Phase = 'drawing' | 'animating' | 'question' | 'exhausted';
 
@@ -103,7 +103,7 @@ export default function Play() {
 
         {phase === 'exhausted' && (
           <View style={styles.center}>
-            <BrandText style={[styles.wow, { color: t.accent }]}>¡Wow! Hoy sí hablaron de todo 🧡</BrandText>
+            <ScriptText size={40} color={t.accent}>¡Wow! Hoy sí hablaron de todo 🧡</ScriptText>
             <Text style={[styles.wowSub, { color: t.questionInk }]}>
               Ya no quedan preguntas nuevas de {edition.name} por hoy. Mañana vuelven a estar disponibles.
             </Text>
@@ -125,6 +125,5 @@ const styles = StyleSheet.create({
   actions: { gap: 12, paddingBottom: 6, paddingTop: 10 },
   actionsHidden: { opacity: 0 },
   shareHint: { fontFamily: fonts.body, fontWeight: '700', fontSize: 13, textAlign: 'center', letterSpacing: 0.4, opacity: 0.8 },
-  wow: { fontFamily: fonts.script, fontSize: 40, textAlign: 'center', lineHeight: scriptLineHeight(40), paddingHorizontal: scriptSidePadding(40) },
   wowSub: { fontFamily: fonts.body, fontWeight: '600', fontSize: 16, lineHeight: 24, textAlign: 'center', marginTop: 14, maxWidth: 340 },
 });
