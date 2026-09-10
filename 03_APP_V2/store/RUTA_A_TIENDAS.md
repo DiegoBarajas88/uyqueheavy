@@ -49,7 +49,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 |    | · Seguridad de datos: "No recopila ni comparte datos del usuario" (la app no tiene cuentas ni analítica) | | |
 | B7 | Ficha de Play Store (Store listing). Pegar desde `store/APP_STORE_FICHA.md`: nombre, descripción corta (80), descripción completa. Categoría: Entretenimiento. Correo: contacto@diegobarajas.com | 👤 | ⬜ |
 | B8 | Recursos gráficos: **listos** en `2. Desarrollos Propios/UY QUE HEAVY/assets_play/` (ícono 512, gráfico 1024×500 y las 5 capturas) | 🤖 ✅ prepara · 👤 ⬜ sube | 🔄 |
-| B9 | Generar el AAB de producción: `eas build -p android --profile production` | 👤 | ✅ versionCode 2 (sin baraja física) · ⬜ regenerar con la baraja física antes de subir a Play |
+| B9 | Generar el AAB de producción: `eas build -p android --profile production` | 🤖 | 🔄 versionCode 3 con la baraja física, en curso 2026-09-10 |
 | B10 | Primera subida SIEMPRE manual: Play Console → Pruebas → Prueba interna → Crear versión → subir el `.aab` descargado de EAS. Google lo exige para activar la firma de Play | 👤 | ⬜ |
 | B11 | ~~Prueba cerrada de 12 testers × 14 días~~ — **NO APLICA** por ser cuenta de organización | — | ✅ evitado |
 | B12 | Pasar directo a Producción | 👤 | ⬜ |
