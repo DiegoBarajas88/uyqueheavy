@@ -39,7 +39,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 | B3 | Pagar USD 25 (una sola vez) con tarjeta | 👤 | ✅ |
 | B4 | Verificación de **empresa**: documentos que coincidan con D&B → `Articles of Organization` + carta IRS `147C` (ambos en `3. Legal/`). Más OTP a correo y celular | 👤 | ⬜ |
 | B5 | App creada en Play Console: `Uy Qué Heavy`, paquete com.uyqueheavy.app, es-419, App, Gratis | 👤 | ✅ 2026-09-10 |
-| B6 | Declaraciones del panel "Set up your app" (privacidad, sign-in, ads, clasificación, público, data safety, gobierno, financiero, salud, categoría) | 👤 | 🔄 en curso 2026-09-10 |
+| B6 | Declaraciones del panel "Set up your app" (privacidad, sign-in, ads, clasificación 12+/Teen, público 18+, data safety, gobierno, financiero, salud, advertising ID, categoría) | 👤 | ✅ 2026-09-10 |
 |    | · Política de privacidad: `https://uyqueheavy.vercel.app/privacidad.html` | | |
 |    | · Acceso a la app: "Todas las funciones están disponibles sin restricciones" | | |
 |    | · Anuncios: No contiene anuncios | | |
@@ -47,7 +47,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 |    | · Público objetivo: 18 años o más. No dirigida a niños | | |
 |    | · App de noticias: No · App de salud: No · App financiera: No · App gubernamental: No | | |
 |    | · Seguridad de datos: "No recopila ni comparte datos del usuario" (la app no tiene cuentas ni analítica) | | |
-| B7 | Ficha de Play Store (Store listing). Pegar desde `store/APP_STORE_FICHA.md`: nombre, descripción corta (80), descripción completa. Categoría: Entretenimiento. Correo: contacto@diegobarajas.com | 👤 | ⬜ |
+| B7 | Ficha de Play Store (Store listing): textos de `store/APP_STORE_FICHA.md`, categoría Entretenimiento, contacto | 👤 | ✅ 2026-09-10, "Ready to send for review" |
 | B8 | Recursos gráficos: **listos** en `2. Desarrollos Propios/UY QUE HEAVY/assets_play/` (ícono 512, gráfico 1024×500 y las 5 capturas) | 🤖 ✅ prepara · 👤 ⬜ sube | 🔄 |
 | B9 | Generar el AAB de producción: `eas build -p android --profile production` | 🤖 | ✅ versionCode 3 (2026-09-10) con la baraja física. Descargado en `~/Downloads/uyqueheavy-v2.0.0-3.aab`. Link: https://expo.dev/artifacts/eas/Jo2RbnDp2nCwkmLnloltg_IUujrBzAkAeRSjHJ5P_Vo.aab |
 | B10 | Primera subida SIEMPRE manual: Play Console → Pruebas → Prueba interna → Crear versión → subir el `.aab` descargado de EAS. Google lo exige para activar la firma de Play | 👤 | ⬜ |
