@@ -23,13 +23,14 @@ type Props = {
  */
 export default function ScriptText({ children, size, color, style }: Props) {
   const pad = scriptSidePadding(size);
+  const android = Platform.OS === 'android';
   return (
-    <View style={[styles.wrap, { paddingHorizontal: pad }, style]}>
+    <View style={[styles.wrap, { paddingHorizontal: android ? pad : 0, paddingBottom: Math.ceil(size * 0.12) }, style]}>
       <Text
         style={[
           styles.text,
-          { fontSize: size, lineHeight: scriptLineHeight(size), color },
-          Platform.OS === 'android' && styles.android,
+          { fontSize: size, lineHeight: scriptLineHeight(size), color, paddingHorizontal: android ? 0 : pad },
+          android && styles.android,
         ]}
       >
         {children}
