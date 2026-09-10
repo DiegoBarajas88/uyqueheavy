@@ -38,18 +38,18 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 | B2 | Tipo de cuenta: **Organización** · nombre de desarrollador público: `Uy Qué Heavy` · perfil de pagos con D-U-N-S `134806247` | 👤 | ✅ |
 | B3 | Pagar USD 25 (una sola vez) con tarjeta | 👤 | ✅ |
 | B4 | Verificación de **empresa**: documentos que coincidan con D&B → `Articles of Organization` + carta IRS `147C` (ambos en `3. Legal/`). Más OTP a correo y celular | 👤 | ⬜ |
-| B5 | Cuando la cuenta esté verificada: botón **Crear app**. Nombre: `Uy Qué Heavy` · Idioma predeterminado: `Español (Latinoamérica)` · Tipo: `App` · Gratis · aceptar declaraciones | 👤 | ⬜ |
-| B6 | En el panel "Configura tu app" completar cada declaración con estas respuestas: | 👤 | ⬜ |
+| B5 | App creada en Play Console: `Uy Qué Heavy`, paquete com.uyqueheavy.app, es-419, App, Gratis | 👤 | ✅ 2026-09-10 |
+| B6 | Declaraciones del panel "Set up your app" (privacidad, sign-in, ads, clasificación, público, data safety, gobierno, financiero, salud, categoría) | 👤 | 🔄 en curso 2026-09-10 |
 |    | · Política de privacidad: `https://uyqueheavy.vercel.app/privacidad.html` | | |
 |    | · Acceso a la app: "Todas las funciones están disponibles sin restricciones" | | |
 |    | · Anuncios: No contiene anuncios | | |
-|    | · Clasificación de contenido: cuestionario IARC, categoría "Entretenimiento"; en preguntas de contenido sexual responder que hay referencias/temas de intimidad (texto), sin desnudos. Da 16+ o 18+ | | |
+|    | · Clasificación de contenido: cuestionario IARC, "All other app types". **Downloaded app = Yes** (si no, sale "todas las edades"). Sexualidad: temas/referencias sugerentes + referencias a actividad sexual sin detalle. Lenguaje: minor profanities, rarely. Resto No | | |
 |    | · Público objetivo: 18 años o más. No dirigida a niños | | |
 |    | · App de noticias: No · App de salud: No · App financiera: No · App gubernamental: No | | |
 |    | · Seguridad de datos: "No recopila ni comparte datos del usuario" (la app no tiene cuentas ni analítica) | | |
 | B7 | Ficha de Play Store (Store listing). Pegar desde `store/APP_STORE_FICHA.md`: nombre, descripción corta (80), descripción completa. Categoría: Entretenimiento. Correo: contacto@diegobarajas.com | 👤 | ⬜ |
 | B8 | Recursos gráficos: **listos** en `2. Desarrollos Propios/UY QUE HEAVY/assets_play/` (ícono 512, gráfico 1024×500 y las 5 capturas) | 🤖 ✅ prepara · 👤 ⬜ sube | 🔄 |
-| B9 | Generar el AAB de producción: `eas build -p android --profile production` | 🤖 | 🔄 versionCode 3 con la baraja física, en curso 2026-09-10 |
+| B9 | Generar el AAB de producción: `eas build -p android --profile production` | 🤖 | ✅ versionCode 3 (2026-09-10) con la baraja física. Descargado en `~/Downloads/uyqueheavy-v2.0.0-3.aab`. Link: https://expo.dev/artifacts/eas/Jo2RbnDp2nCwkmLnloltg_IUujrBzAkAeRSjHJ5P_Vo.aab |
 | B10 | Primera subida SIEMPRE manual: Play Console → Pruebas → Prueba interna → Crear versión → subir el `.aab` descargado de EAS. Google lo exige para activar la firma de Play | 👤 | ⬜ |
 | B11 | ~~Prueba cerrada de 12 testers × 14 días~~ — **NO APLICA** por ser cuenta de organización | — | ✅ evitado |
 | B12 | Pasar directo a Producción | 👤 | ⬜ |
