@@ -18,8 +18,15 @@ type Props = {
  * padding del Text no entra en la medición: el texto se medía a un ancho y se
  * dibujaba a otro más angosto, saltaba de línea al dibujar y la segunda línea
  * quedaba recortada ("Love" sin "Edition"), o un remate se colaba en el texto de
- * abajo. Aquí el aire va en una View envolvente, que sí se mide bien en todas partes,
- * y el <Text> no lleva padding.
+ * abajo. En iOS pasa lo contrario: recorta los glifos al borde del propio <Text>, así
+ * que ahí el aire tiene que ir DENTRO del texto (con el aire solo en la View envolvente
+ * la "L" de "Love" salía cortada).
+ *
+ * Por eso el aire lateral va en sitios distintos según la plataforma:
+ *   · iOS y web → paddingHorizontal en el <Text>
+ *   · Android  → paddingHorizontal en la View envolvente
+ * Y abajo un poco de aire extra para que las colas (la "y" de Family) no toquen la
+ * línea siguiente.
  */
 export default function ScriptText({ children, size, color, style }: Props) {
   const pad = scriptSidePadding(size);
