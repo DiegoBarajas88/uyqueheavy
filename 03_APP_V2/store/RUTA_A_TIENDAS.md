@@ -64,8 +64,8 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 |---|------|-------|--------|
 | C1 | Entrar a https://appstoreconnect.apple.com (Apple ID appsdb123@gmail.com, equipo Viko Holdings LLC) | 👤 | ✅ |
 | C2 | App creada en App Store Connect: `Uy Qué Heavy`, vendedor Viko Holdings, SKU uqh-app-v2, ASC App ID 6810321248 | 👤 | ✅ |
-| C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | 🔄 **build 9** (2026-09-09) en curso: mesa/vuelo/carta en capas separadas (el 8 aún mostraba el mazo encima de la carta) |
-| C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS) | 🤖 | 🔄 build 9 se sube solo al terminar |
+| C3 | Build iOS de producción: `eas build -p ios --profile production` | 👤 | ✅ **build 9** (2026-09-09): mesa/vuelo/carta en capas separadas, tipografía script robusta. Builds 5 a 8 quedaron atrás |
+| C4 | Subir el build: `eas submit -p ios --latest`. API key de App Store Connect creada (rol APP_MANAGER, guardada en EAS) | 🤖 | ✅ build 9 subido 2026-09-09 22:50; Apple procesa y manda correo |
 | C5 | Ficha en App Store Connect, campo por campo → ver "Guía C5" abajo | 👤 | ⬜ |
 | C6 | Privacidad de la app: "No se recopilan datos" → incluido en Guía C5, pantalla 4 | 👤 | ⬜ |
 | C7 | TestFlight: probar el **build 9** en tu iPhone. La web ya lo tiene en uyqueheavy.vercel.app | 👤 | 🔄 |
@@ -77,7 +77,7 @@ Datos de la empresa, documentos de respaldo y la guía detallada de cada pantall
 
 | # | Paso | Quién | Estado |
 |---|------|-------|--------|
-| D1 | `eas build -p android --profile preview` → APK instalable directo en cualquier Android | 🤖 | 🔄 APK nuevo en curso (corrige "Love" sin "Edition" y remates cortados en Android). Anterior: https://expo.dev/artifacts/eas/hDTPdM_sSol3IDMObiL05r1fLnBDxQeeRExSNmg_8O0.apk · Play Protect bloquea: tocar "Instalar de todas formas"; si dice "No se ha instalado": verificar tamaño 104 MB, espacio libre y reiniciar |
+| D1 | `eas build -p android --profile preview` → APK instalable directo en cualquier Android | 🤖 | ✅ APK actual (2026-09-09 23:09, tipografía corregida): https://expo.dev/artifacts/eas/exlF-mBPoTBzlVf0IOxN8fT-rtNy46XdWuwezit8nUg.apk · Play Protect bloquea: tocar "Instalar de todas formas"; si dice "No se ha instalado": verificar tamaño 104 MB, espacio libre y reiniciar |
 | D2 | `eas build -p ios --profile preview` → requiere registrar el UDID de tu iPhone (EAS te guía con un link) | 👤 ejecuta | ⬜ |
 | D3 | Instalar en 2-3 celulares y jugar una ronda completa de cada edición | 👤 + Erika | ⬜ |
 
